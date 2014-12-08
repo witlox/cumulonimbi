@@ -1,0 +1,12 @@
+# file for running tests on travis-ci.com
+language: python
+# supported language versions
+python:
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "pypy"
+# dependency install
+# install: "pip install -r requirements.txt"
+# run all tests
+script: nosetests
