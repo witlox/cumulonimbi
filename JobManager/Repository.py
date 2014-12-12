@@ -18,4 +18,4 @@ class JobManagerRepository():
 
     def insert_job(self, job_name):
         job = {'name':job_name}
-        return self.client.jobs.insert(job)
+        return self.client.insert(job)
