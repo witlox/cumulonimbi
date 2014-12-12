@@ -6,8 +6,7 @@ from pymongo import MongoClient
 class JobManagerRepository():
     def __init__(self):
         self.client = MongoClient('mongodbhost.cloudapp.net', 27017)
-        #self.db = self.client.job_manager
-        #self.jobs = self.client.jobs
+        self.jobs = self.client.job_manager.jobs
 
     def get_all_jobs(self):
         all_jobs = []
@@ -18,4 +17,4 @@ class JobManagerRepository():
 
     def insert_job(self, job_name):
         job = {'name':job_name}
-        return self.client.insert(job)
+        return self.jobs.insert(job)
