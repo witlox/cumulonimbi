@@ -26,7 +26,8 @@ class TestRepository(unittest.TestCase):
             rv = self.app.post('/jobs', data=dict(jobname=job_name))
 
             # Assert
-            self.assertEqual({'job_id': job_id}, json.loads(rv.data))
+            body = rv.data.decode(rv.charset)
+            self.assertEqual({'job_id': job_id}, json.loads(body))
             repository.jobs.insert.assert_called_with({'name': "new job"})
 
     def test_get_jobs(self):
@@ -44,7 +45,8 @@ class TestRepository(unittest.TestCase):
             rv = self.app.get('/jobs')
 
             # Assert
-            self.assertEquals(expected_result, json.loads(rv.data))
+            body = rv.data.decode(rv.charset)
+            self.assertEquals(expected_result, json.loads(body))
             repository.jobs.find.assert_called_once()
 
     def test_get_job(self):
@@ -62,7 +64,8 @@ class TestRepository(unittest.TestCase):
             rv = self.app.get('/jobs/1')
 
             # Assert
-            self.assertEquals(expected_result, json.loads(rv.data))
+            body = rv.data.decode(rv.charset)
+            self.assertEquals(expected_result, json.loads(body))
             repository.jobs.find.assert_called_once()
 
 if __name__ == '__main__':
