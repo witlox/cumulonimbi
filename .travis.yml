@@ -9,4 +9,4 @@ python:
 # dependency install
 install: "pip install -r requirements.txt"
 # run all tests
-script: nosetests unittests
+script: nosetests tests/unittests
