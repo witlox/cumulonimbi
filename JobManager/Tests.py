@@ -10,6 +10,11 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(job.name, name)
 
+    def test_failure(self):
+        name = "test name"
+        job = Job.Job({'name': name})
+
+        self.assertEqual(job.name, "abc")
 
 if __name__ == '__main__':
     unittest.main()
