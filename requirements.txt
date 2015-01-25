@@ -1,3 +1,5 @@
+mock
 bson
 pymongo
 flask
+nose
