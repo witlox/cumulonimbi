@@ -25,23 +25,26 @@ class JobManagerIntegrationTests(unittest.TestCase):
             assert(len(jobs) == 2)
 
         def test_api(self):
-            api.repository = JobManagerRepository("test_jobs")
+            api.config['REPOSITORY'] = JobManagerRepository("test_jobs")
             app = api.test_client()
 
             rv = app.get('/jobs')
-            jobs = json.loads(rv.data)
+            body = rv.data.decode(rv.charset)
+            jobs = json.loads(body)
 
             for job in jobs:
                 id = job["_id"]["$oid"]
                 rv = app.delete('/jobs/' + str(id))
 
             rv = app.get('/jobs')
-            jobs = json.loads(rv.data)
+            body = rv.data.decode(rv.charset)
+            jobs = json.loads(body)
             assert(len(jobs) == 0)
 
             id_A = app.post('/jobs', data=dict(jobname="A"))
             id_A = app.post('/jobs', data=dict(jobname="B"))
 
             rv = app.get('/jobs')
-            jobs = json.loads(rv.data)
+            body = rv.data.decode(rv.charset)
+            jobs = json.loads(body)
             assert(len(jobs) == 2)
