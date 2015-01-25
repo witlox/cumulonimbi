@@ -1,54 +1,69 @@
 __author__ = 'Johannes'
 
 import unittest
-from bson.json_util import dumps
-from job_manager import api
-from flask import Response
+import json
 
+import mock
 
-class MyRepository():
-    def __init__(self):
-        self.jobs = [
-            {'name': "first job"},
-            {'name': "second job"},
-        ]
-
-    def get_all_jobs(self):
-        return self.jobs
+from job_manager.repository import JobManagerRepository
+from job_manager.api import api
 
 
 class TestRepository(unittest.TestCase):
-    def setUp(self):
-        self.repository = MyRepository()
-        api.repository = self.repository
-        self.app = api.api.test_client()
-
     def test_insert_job(self):
         # Arrange
-        jobname = "new job"
+        with mock.patch('job_manager.repository.MongoClient') as mc:
+            repository = JobManagerRepository()
+            api.config['REPOSITORY'] = repository
 
-        # Act
-        rv = self.app.post('/jobs', data=dict(jobname=jobname))
+            job_id = 1
+            repository.jobs.insert.return_value = job_id
 
-        # Assert
+            self.app = api.test_client()
+            job_name = "new job"
 
+            # Act
+            rv = self.app.post('/jobs', data=dict(jobname=job_name))
+
+            # Assert
+            self.assertEqual({'job_id': job_id}, json.loads(rv.data))
+            repository.jobs.insert.assert_called_with({'name': "new job"})
 
     def test_get_jobs(self):
         # Arrange
-        expected = Response(dumps(self.repository.jobs), mimetype='application/json')
+        with mock.patch('job_manager.repository.MongoClient') as mc:
+            repository = JobManagerRepository()
+            api.config['REPOSITORY'] = repository
 
-        # Act
-        rv = self.app.get('/jobs')
+            expected_result = [{'name': "new job"}]
+            repository.jobs.find.return_value = expected_result
 
-        # Assert
-        assert (expected.data == rv.data)
+            self.app = api.test_client()
+
+            # Act
+            rv = self.app.get('/jobs')
+
+            # Assert
+            self.assertEquals(expected_result, json.loads(rv.data))
+            repository.jobs.find.assert_called_once()
 
     def test_get_job(self):
         # Arrange
-        expected = Response(dumps(self.repository.jobs), mimetype='application/json')
+        with mock.patch('job_manager.repository.MongoClient') as mc:
+            repository = JobManagerRepository()
+            api.config['REPOSITORY'] = repository
 
-        # Act
-        rv = self.app.get('/jobs')
+            expected_result = [{'name': "new job"}]
+            repository.jobs.find_one.return_value = expected_result
 
-        # Assert
-        assert (expected.data == rv.data)
+            self.app = api.test_client()
+
+            # Act
+            rv = self.app.get('/jobs/1')
+
+            # Assert
+            self.assertEquals(expected_result, json.loads(rv.data))
+            repository.jobs.find.assert_called_once()
+
+if __name__ == '__main__':
+    unittest.main()

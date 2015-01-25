@@ -2,21 +2,24 @@ __author__ = 'Johannes'
 
 from bson.json_util import dumps
 from flask import Flask, Response, request
-from job_manager.repository import JobManagerRepository
+
+REPOSITORY = 'test'
 
 api = Flask(__name__)
-repository = JobManagerRepository()
-
+api.config.from_object(__name__)
 
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
-    return Response(dumps(repository.get_all_jobs()), mimetype='application/json')
+    repository = api.config['REPOSITORY']
+    response = dumps(repository.get_all_jobs())
+    return Response(response, mimetype='application/json')
 
 
 @api.route('/jobs', methods=['POST'])
 def create_job():
-    jobname = request.form['jobname']
-    response = {'job_id': repository.insert_job(jobname)}
+    job_name = request.form['jobname']
+    repository = api.config['REPOSITORY']
+    response = {'job_id': repository.insert_job(job_name)}
     return Response(dumps(response), mimetype='application/json')
 
 
@@ -27,12 +30,14 @@ def edit_job(job_id):
 
 @api.route('/jobs/<job_id>', methods=['GET'])
 def get_job(job_id):
+    repository = api.config['REPOSITORY']
     response = repository.get_job(job_id)
     return Response(dumps(response), mimetype='application/json')
 
 
 @api.route('/jobs/<job_id>', methods=['DELETE'])
 def delete_job(job_id):
+    repository = api.config['REPOSITORY']
     response = repository.delete_job(job_id)
     return Response(dumps(response), mimetype='application/json')
 

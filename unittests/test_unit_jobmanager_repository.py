@@ -1,14 +1,13 @@
 __author__ = 'Johannes'
 
 from job_manager.repository import JobManagerRepository
-
-from mock import patch
+import mock
 import unittest
 
 
 class TestRepository(unittest.TestCase):
     def test_insert_job(self):
-        with patch('job_manager.repository.MongoClient') as mc:
+        with mock.patch('job_manager.repository.MongoClient') as mc:
             # Arrange
             repository = JobManagerRepository()
 
@@ -19,7 +18,7 @@ class TestRepository(unittest.TestCase):
             repository.jobs.insert.assert_called_with({'name': "new job"})
 
     def test_get_all_jobs(self):
-        with patch('job_manager.repository.MongoClient') as mc:
+        with mock.patch('job_manager.repository.MongoClient') as mc:
             # Arrange
             repository = JobManagerRepository()
             repository.jobs.find.return_value = [{'name': "new job"}]
@@ -32,7 +31,7 @@ class TestRepository(unittest.TestCase):
             repository.jobs.find.assert_called_once()
 
     def test_find_one(self):
-        with patch('job_manager.repository.MongoClient') as mc:
+        with mock.patch('job_manager.repository.MongoClient') as mc:
             # Arrange
             job = {'_id': 123, 'name': "new job"}
             repository = JobManagerRepository()
