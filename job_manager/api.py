@@ -3,10 +3,11 @@ __author__ = 'Johannes'
 from bson.json_util import dumps
 from flask import Flask, Response, request
 
-REPOSITORY = 'test'
+REPOSITORY = 'empty'
 
-api = Flask(__name__)
+api = Flask(__name__, instance_relative_config=True)
 api.config.from_object(__name__)
+api.config.from_pyfile('../../cumulonimbi.jm.py', silent=True)
 
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
