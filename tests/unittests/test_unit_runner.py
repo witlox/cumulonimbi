@@ -27,9 +27,9 @@ class TestRunner(unittest.TestCase):
             # Act
             runner.run()
             # Assert
-            me.assert_called_with(t1.label, t1.executable, t1.parameters)
-            me.assert_called_with(t2.label, t2.executable, t2.parameters)
-            me.assert_called_with(t3.label, t3.executable, t3.parameters)
+            me.assert_any_call(t1.label, t1.executable, t1.parameters)
+            me.assert_any_call(t2.label, t2.executable, t2.parameters)
+            me.assert_any_call(t3.label, t3.executable, t3.parameters)
 
 if __name__ == '__main__':
     unittest.main()
