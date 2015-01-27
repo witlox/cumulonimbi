@@ -10,6 +10,7 @@ from job_manager.api import api
 
 
 class TestRepository(unittest.TestCase):
+
     def setUp(self):
         with mock.patch('job_manager.repository.MongoClient') as mc:
             self.repository = JobManagerRepository()

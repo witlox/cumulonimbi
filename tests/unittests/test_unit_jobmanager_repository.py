@@ -6,6 +6,7 @@ import unittest
 
 
 class TestRepository(unittest.TestCase):
+
     @mock.patch('job_manager.repository.MongoClient')
     def test_insert_job(self, mc):
         # Arrange

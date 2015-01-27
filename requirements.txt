@@ -1,3 +1,4 @@
+bson
 mock
 pymongo
 flask

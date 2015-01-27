@@ -6,6 +6,7 @@ from pymongo import MongoClient
 
 
 class JobManagerRepository():
+
     def __init__(self, collection=None):
         if collection is None:
             collection = "jobs"

@@ -8,6 +8,7 @@ import unittest
 
 
 class JobManagerIntegrationTests(unittest.TestCase):
+
         def test_jm(self):
             jm = JobManagerRepository("test_jobs")
 
