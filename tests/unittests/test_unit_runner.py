@@ -1,5 +1,7 @@
 __author__ = 'Johannes'
 
+import sys
+import logging
 import mock
 import unittest
 import networkx as nx
@@ -23,7 +25,7 @@ class TestRunner(unittest.TestCase):
         runner = Runner(g)
         with mock.patch('job_manager.runner.Runner.__execute__') as me:
             for edge in nx.dfs_edges(g):
-                print "left: " + edge[0].label + ", right: " + edge[1].label
+                logging.warning("left: %s, right: %s", edge[0].label, edge[1].label)
             # Act
             runner.run()
             # Assert
@@ -31,5 +33,7 @@ class TestRunner(unittest.TestCase):
             me.assert_any_call(t2.label, t2.executable, t2.parameters)
             me.assert_any_call(t3.label, t3.executable, t3.parameters)
 
+
 if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     unittest.main()
