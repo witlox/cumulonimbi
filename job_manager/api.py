@@ -5,7 +5,9 @@ from flask import Flask, Response, request
 
 REPOSITORY = 'empty'
 
-""  ""
+"""
+This is the main api for the job manager
+"""
 
 api = Flask(__name__, instance_relative_config=True)
 api.config.from_object(__name__)
