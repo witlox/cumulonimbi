@@ -3,6 +3,7 @@ __author__ = 'Johannes'
 from pymongo import MongoClient
 
 
+# noinspection PyUnresolvedReferences
 class JobManagerRepository():
     def __init__(self, collection=None):
         if collection is None:
