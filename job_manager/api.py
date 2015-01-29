@@ -5,6 +5,8 @@ from flask import Flask, Response, request
 
 REPOSITORY = 'empty'
 
+""  ""
+
 api = Flask(__name__, instance_relative_config=True)
 api.config.from_object(__name__)
 api.config.from_pyfile('../../cumulonimbi.jm.py', silent=True)
@@ -44,4 +46,4 @@ def delete_job(job_id):
 
 
 if __name__ == "__main__":
-    api.run(debug=True)
+    api.run(host='0.0.0.0', debug=True)

@@ -5,6 +5,11 @@ import networkx as nx
 
 
 class Runner:
+
+    """
+    This runner will run
+    """
+
     def __init__(self, execution_graph):
         """
         :param execution_graph: graph (DAG) of the execution flow (networkx)
@@ -22,6 +27,6 @@ class Runner:
                 self.__execute__(task[1].label, task[1].executable, task[1].parameters)
             done.append(task[1])
 
-    def __execute__(self, name, exe, args):
+    def __execute__(name, exe, args):
         if name and exe:
             p.call(executable=exe, args=args)
