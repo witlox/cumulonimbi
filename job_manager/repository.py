@@ -8,7 +8,7 @@ class JobManagerRepository():
     def __init__(self, collection=None):
         if collection is None:
             collection = "jobs"
-        self.client = MongoClient('mongodbhost.cloudapp.net', 27017)
+        self.client = MongoClient('127.0.0.1', 27017)
         self.jobs = self.client.job_manager[collection]
 
     def get_all_jobs(self):

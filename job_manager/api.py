@@ -1,9 +1,11 @@
+
 __author__ = 'Johannes'
 
 from bson.json_util import dumps
+from job_manager.repository import JobManagerRepository
 from flask import Flask, Response, request
 
-REPOSITORY = 'empty'
+REPOSITORY = JobManagerRepository()
 
 """
 This is the main api for the job manager
