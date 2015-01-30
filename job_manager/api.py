@@ -5,15 +5,11 @@ from bson.json_util import dumps
 from job_manager.repository import JobManagerRepository
 from flask import Flask, Response, request
 
-REPOSITORY = JobManagerRepository()
-
 """
 This is the main api for the job manager
 """
 
 api = Flask(__name__, instance_relative_config=True)
-api.config.from_object(__name__)
-api.config.from_pyfile('../../cumulonimbi.jm.py', silent=True)
 
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
@@ -50,4 +46,7 @@ def delete_job(job_id):
 
 
 if __name__ == "__main__":
+    REPOSITORY = JobManagerRepository()
+    api.config.from_object(__name__)
+    api.config.from_pyfile('../../cumulonimbi.jm.py', silent=True)
     api.run(host='0.0.0.0', debug=True)
