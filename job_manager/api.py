@@ -5,7 +5,7 @@ if __name__ == '__main__' and __package__ is None:
 __author__ = 'Johannes'
 
 from bson.json_util import dumps
-from repository import JobManagerRepository
+from job_manager.repository import JobManagerRepository
 from flask import Flask, Response, request
 
 """
