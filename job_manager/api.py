@@ -2,7 +2,7 @@
 __author__ = 'Johannes'
 
 from bson.json_util import dumps
-from job_manager.repository import JobManagerRepository
+from repository import JobManagerRepository
 from flask import Flask, Response, request
 
 """
