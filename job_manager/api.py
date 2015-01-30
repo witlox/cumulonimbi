@@ -1,18 +1,20 @@
+__author__ = 'Johannes'
+
+""" This is needed for 2.x and 3.x compatibility regarding imports """
 if __name__ == '__main__' and __package__ is None:
     from os import sys, path
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-__author__ = 'Johannes'
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
 from bson.json_util import dumps
 from job_manager.repository import JobManagerRepository
 from flask import Flask, Response, request
 
 """
-This is the main api for the job manager
+This is the main api for the job manager, entry point to Cumulonimbi
 """
-
 api = Flask(__name__, instance_relative_config=True)
+
 
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
@@ -49,7 +51,10 @@ def delete_job(job_id):
 
 
 if __name__ == "__main__":
-    REPOSITORY = JobManagerRepository()
+    REPOSITORY = None
     api.config.from_object(__name__)
     api.config.from_pyfile('../../cumulonimbi.jm.py', silent=True)
+    if api.config['REPOSITORY'] is None:
+        api.config['REPOSITORY'] = JobManagerRepository()
+
     api.run(host='0.0.0.0', debug=True)
