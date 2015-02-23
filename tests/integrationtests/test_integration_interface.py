@@ -6,7 +6,7 @@ import json
 
 class InterfaceIntegrationTests(unittest.TestCase):
     def test_get_jobs(self):
-        jobs_url = "http://localhost:5000/jobs"
+        jobs_url = "http://127.0.0.1:5000/jobs"
         requests.delete(jobs_url)
 
         r = requests.get(jobs_url)
@@ -15,7 +15,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(len(jobs) == 0)
 
     def test_add_job(self):
-        jobs_url = "http://localhost:5000/jobs"
+        jobs_url = "http://127.0.0.1:5000/jobs"
         requests.delete(jobs_url)
 
         data = {'jobname': 'api_job'}
