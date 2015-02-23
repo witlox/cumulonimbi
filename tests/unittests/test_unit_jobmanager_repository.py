@@ -1,6 +1,7 @@
 __author__ = 'Johannes'
 
 from job_manager.repository import JobManagerRepository
+from bson import ObjectId
 import mock
 import unittest
 
@@ -34,7 +35,8 @@ class TestRepository(unittest.TestCase):
     @mock.patch('job_manager.repository.MongoClient')
     def test_find_one(self, mc):
         # Arrange
-        job = {'_id': 123, 'name': "new job"}
+        job_id = str(ObjectId())
+        job = {'_id': job_id, 'name': "new job"}
         repository = JobManagerRepository()
         repository.jobs.find_one.return_value = job
 
@@ -42,7 +44,7 @@ class TestRepository(unittest.TestCase):
         job = repository.get_job(job['_id'])
 
         # Assert
-        assert(job['_id'] == 123)
+        assert(job['_id'] == job_id)
         repository.jobs.find.assert_called_once()
 
 if __name__ == '__main__':

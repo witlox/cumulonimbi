@@ -4,7 +4,7 @@ import unittest
 import json
 
 import mock
-
+from bson import ObjectId
 from job_manager.repository import JobManagerRepository
 from job_manager.api import api
 
@@ -18,7 +18,7 @@ class TestRepository(unittest.TestCase):
 
     def test_insert_job(self):
         # Arrange
-        job_id = 1
+        job_id = "1"
         self.repository.jobs.insert.return_value = job_id
 
         self.app = api.test_client()
@@ -50,12 +50,13 @@ class TestRepository(unittest.TestCase):
     def test_get_job(self):
         # Arrange
         expected_result = [{'name': "new job"}]
+        job_id = str(ObjectId())
         self.repository.jobs.find_one.return_value = expected_result
 
         self.app = api.test_client()
 
         # Act
-        rv = self.app.get('/jobs/1')
+        rv = self.app.get('/jobs/' + job_id)
 
         # Assert
         body = rv.data.decode(rv.charset)

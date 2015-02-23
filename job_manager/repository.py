@@ -1,9 +1,8 @@
 __author__ = 'Johannes'
 
 from pymongo import MongoClient
+from bson import ObjectId
 
-
-# noinspection PyUnresolvedReferences
 class JobManagerRepository():
     def __init__(self, collection=None):
         if collection is None:
@@ -19,11 +18,11 @@ class JobManagerRepository():
         return all_jobs
 
     def insert_job(self, job_name):
-        job_id = self.jobs.insert({'name': job_name})
+        job_id = str(self.jobs.insert({'name': job_name}))
         return job_id
 
     def get_job(self, job_id):
-        job = self.jobs.find_one({"_id": job_id})
+        job = self.jobs.find_one({"_id": ObjectId(job_id)})
         return job
 
     def delete_job(self, job_id):
