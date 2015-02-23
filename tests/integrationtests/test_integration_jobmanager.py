@@ -11,10 +11,7 @@ class JobManagerIntegrationTests(unittest.TestCase):
 
         def test_jm(self):
             jm = JobManagerRepository("test_jobs")
-
-            jobs = jm.get_all_jobs()
-            for job in jobs:
-                jm.delete_job(job["_id"])
+            jm.delete_all_jobs()
 
             jobs = jm.get_all_jobs()
             assert(len(jobs) == 0)
@@ -28,14 +25,7 @@ class JobManagerIntegrationTests(unittest.TestCase):
         def test_api(self):
             api.config['REPOSITORY'] = JobManagerRepository("test_jobs")
             app = api.test_client()
-
-            rv = app.get('/jobs')
-            body = rv.data.decode(rv.charset)
-            jobs = json.loads(body)
-
-            for job in jobs:
-                id = job["_id"]["$oid"]
-                rv = app.delete('/jobs/' + str(id))
+            app.delete('/jobs')
 
             rv = app.get('/jobs')
             body = rv.data.decode(rv.charset)

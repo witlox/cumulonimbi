@@ -22,6 +22,11 @@ def get_jobs():
     response = dumps(repository.get_all_jobs())
     return Response(response, mimetype='application/json')
 
+@api.route('/jobs', methods=['DELETE'])
+def delete_jobs():
+    repository = api.config['REPOSITORY']
+    response = dumps(repository.delete_all_jobs())
+    return Response(response, mimetype='application/json')
 
 @api.route('/jobs', methods=['POST'])
 def create_job():

@@ -27,3 +27,6 @@ class JobManagerRepository():
 
     def delete_job(self, job_id):
         return self.jobs.remove({"_id": ObjectId(job_id)})
+
+    def delete_all_jobs(self):
+        return self.jobs.remove({})
