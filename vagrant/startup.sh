@@ -7,15 +7,15 @@ if [ "$count" -gt 0 ]; then
     docker rm $(docker ps -a -q) > /dev/null && echo "\tAll removed" || echo "\tRemoving Failed"
 fi
 
-echo "Getting latest versions"
-docker pull pblittle/docker-logstash > /dev/null && echo "\tLogstash  OK" || echo "\tLogstack Failed"
-docker pull djbnjack/mongobase > /dev/null && echo "\tMongobase OK" || echo "\tMongobase Failed"
-docker pull djbnjack/jmdocker > /dev/null && echo "\tJMDocker  OK" || echo "\tJMDocker Failed"
+echo "Getting and starting the containers"
+docker pull pblittle/docker-logstash > /dev/null && echo "\tLogstash pull  OK" || echo "\tLogstack Failed"
+docker run -d --net=host --name="elk" pblittle/docker-logstash > /dev/null && echo "\tLogstash run   OK" || echo "\tLogstack Failed"
 
-echo "Starting the containers"
-docker run -d --net=host --name="elk" pblittle/docker-logstash > /dev/null && echo "\tLogstash  OK" || echo "\tLogstack Failed"
-docker run -d --net=host --name="mongodb" djbnjack/mongobase > /dev/null && echo "\tMongobase OK" || echo "\tMongobase Failed"
-docker run -d --net=host --name="jobmanager" djbnjack/jmdocker python cumulonimbi/job_manager/api.py > /dev/null && echo "\tJMDocker  OK" || echo "\tJMDocker Failed"
+docker pull djbnjack/mongobase > /dev/null && echo "\tMongobase pull OK" || echo "\tMongobase Failed"
+docker run -d --net=host --name="mongodb" djbnjack/mongobase > /dev/null && echo "\tMongobase run  OK" || echo "\tMongobase Failed"
+
+docker pull djbnjack/jmdocker > /dev/null && echo "\tJMDocker pull  OK" || echo "\tJMDocker Failed"
+docker run -d --net=host --name="jobmanager" djbnjack/jmdocker python cumulonimbi/job_manager/api.py > /dev/null && echo "\tJMDocker run   OK" || echo "\tJMDocker Failed"
 
 echo "Running integration tests"
 docker run -i --rm --net=host --name="integrationtests" djbnjack/jmdocker nosetests cumulonimbi/tests/integrationtests

@@ -2,7 +2,7 @@ __author__ = 'Johannes'
 
 import unittest
 import requests
-import json
+
 
 class InterfaceIntegrationTests(unittest.TestCase):
     def test_get_jobs(self):
