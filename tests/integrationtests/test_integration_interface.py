@@ -22,6 +22,19 @@ class InterfaceIntegrationTests(unittest.TestCase):
         r = requests.post(jobs_url, data)
         job = r.json()
 
+        r = requests.get(jobs_url)
+        jobs = r.json()
+
+        assert(len(jobs) == 1)
+
+    def test_get_specific_job(self):
+        jobs_url = "http://127.0.0.1:5000/jobs"
+        requests.delete(jobs_url)
+
+        data = {'jobname': 'api_job'}
+        r = requests.post(jobs_url, data)
+        job = r.json()
+
         r = requests.get(jobs_url + '/' + job['job_id'])
         job = r.json()
 
