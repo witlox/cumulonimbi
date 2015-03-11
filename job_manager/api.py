@@ -15,21 +15,13 @@ import logstash
 
 host = 'localhost'
 
-# set up logging to file - see previous section for more details
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s[%(levelname)s](%(lineno)s-%(funcName)s()):%(message)s', filename='api.log')
-# logstash connector
-logger = logging.getLogger('')
-logger.addHandler(logstash.LogstashHandler(host, 5514, version=1))
-
 """
 This is the main api for the job manager, entry point to Cumulonimbi
 """
 api = Flask(__name__, instance_relative_config=True, )
 
-
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
-    logging.error("/jobs called!")
     repository = api.config['REPOSITORY']
     response = dumps(repository.get_all_jobs())
     return Response(response, mimetype='application/json')
@@ -74,4 +66,17 @@ if __name__ == "__main__":
     if api.config['REPOSITORY'] is None:
         api.config['REPOSITORY'] = JobManagerRepository()
 
-    api.run(host='0.0.0.0', debug=True)
+    if api.debug is not True:
+        import logging
+        from logging.handlers import RotatingFileHandler
+        formatter = logging.Formatter("%(asctime)s[%(levelname)s](%(lineno)s-%(funcName)s()):%(message)s")
+        file_handler = RotatingFileHandler('jobmanager_api.log', maxBytes=1024 * 1024 * 100, backupCount=20)
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(formatter)
+        logstash_handler = logstash.LogstashHandler(host, 5514, version=1)
+        logstash_handler.setLevel(logging.INFO)
+        logstash_handler.setFormatter(formatter)
+        api.logger.addHandler(file_handler)
+        api.logger.addHandler(logstash_handler)
+
+    api.run(host='0.0.0.0')
