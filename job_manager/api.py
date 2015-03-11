@@ -22,6 +22,7 @@ api = Flask(__name__, instance_relative_config=True, )
 
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
+    logging.warn("GET /jobs")
     repository = api.config['REPOSITORY']
     response = dumps(repository.get_all_jobs())
     return Response(response, mimetype='application/json')
@@ -78,4 +79,4 @@ if __name__ == "__main__":
     api.logger.addHandler(file_handler)
     api.logger.addHandler(logstash_handler)
 
-    api.run(host='0.0.0.0', debug=True)
+    api.run(host='0.0.0.0')
