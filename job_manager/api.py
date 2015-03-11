@@ -10,14 +10,26 @@ from bson.json_util import dumps
 from job_manager.repository import JobManagerRepository
 from flask import Flask, Response, request
 
+import logging
+import logstash
+
+host = 'localhost'
+
+# set up logging to file - see previous section for more details
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s[%(levelname)s](%(lineno)s-%(funcName)s()):%(message)s', filename='api.log')
+# logstash connector
+logger = logging.getLogger('')
+logger.addHandler(logstash.LogstashHandler(host, 5514, version=1))
+
 """
 This is the main api for the job manager, entry point to Cumulonimbi
 """
-api = Flask(__name__, instance_relative_config=True)
+api = Flask(__name__, instance_relative_config=True, )
 
 
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
+    logging.error("/jobs called!")
     repository = api.config['REPOSITORY']
     response = dumps(repository.get_all_jobs())
     return Response(response, mimetype='application/json')
