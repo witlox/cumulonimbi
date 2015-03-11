@@ -73,7 +73,7 @@ if __name__ == "__main__":
         file_handler = RotatingFileHandler('jobmanager_api.log', maxBytes=1024 * 1024 * 100, backupCount=20)
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
-        logstash_handler = logstash.LogstashHandler(host, 5514, version=1)
+        logstash_handler = logstash.LogstashHandler(host, 9200, version=1)
         logstash_handler.setLevel(logging.INFO)
         logstash_handler.setFormatter(formatter)
         api.logger.addHandler(file_handler)

@@ -8,13 +8,8 @@ if [ "$count" -gt 0 ]; then
 fi
 
 echo "Getting and starting the containers"
-#docker pull pblittle/docker-logstash > /dev/null && echo "\tLogstash pull  OK" || echo "\tLogstack Failed"
-#docker run -d --net=host --name="elk" pblittle/docker-logstash > /dev/null && echo "\tLogstash run   OK" || echo "\tLogstack Failed"
-
-# To get all the /dev/* devices needed for sshd and alike:
-export DEV_MOUNTS="-v /dev/null:/dev/null -v /dev/urandom:/dev/urandom -v /dev/random:/dev/random -v /dev/full:/dev/full -v /dev/zero:/dev/zero"
-docker pull qnib/elk
-docker run -d --net=host --name="elk" --privileged ${DEV_MOUNTS} qnib/elk:latest
+docker pull pblittle/docker-logstash
+docker run -d --net=host --name="elk" pblittle/docker-logstash
 
 docker pull djbnjack/mongobase && echo "\tMongobase pull OK" || echo "\tMongobase Failed"
 docker run -d --net=host --name="mongodb" djbnjack/mongobase && echo "\tMongobase run  OK" || echo "\tMongobase Failed"
