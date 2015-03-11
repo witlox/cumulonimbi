@@ -14,11 +14,11 @@ echo "Getting and starting the containers"
 docker pull djbnjack/mongobase > /dev/null && echo "\tMongobase pull OK" || echo "\tMongobase Failed"
 docker run -d --net=host --name="mongodb" djbnjack/mongobase > /dev/null && echo "\tMongobase run  OK" || echo "\tMongobase Failed"
 
-docker pull djbnjack/jmdocker > /dev/null && echo "\tJMDocker pull  OK" || echo "\tJMDocker Failed"
-docker run -d --net=host --name="jobmanager" djbnjack/jmdocker python cumulonimbi/job_manager/api.py > /dev/null && echo "\tJMDocker run   OK" || echo "\tJMDocker Failed"
+docker pull witlox/cumulonimbi > /dev/null && echo "\tJMDocker pull  OK" || echo "\tJMDocker Failed"
+docker run -d --net=host --name="jobmanager" witlox/cumulonimbi python cumulonimbi/job_manager/api.py > /dev/null && echo "\tJMDocker run   OK" || echo "\tJMDocker Failed"
 
 echo "Waiting 15 seconds for the api to start"
 sleep 15
 
 echo "Running integration tests"
-docker run -i --rm --net=host --name="integrationtests" djbnjack/jmdocker nosetests cumulonimbi/tests/integrationtests
+docker run -i --rm --net=host --name="integrationtests" witlox/cumulonimbi nosetests cumulonimbi/tests/integrationtests

@@ -12,6 +12,6 @@ install: "pip install -r requirements.txt"
 script: nosetests tests/unittests
 # trigger docker build
 after_success:
-  - curl --data "build=true" -X POST https://registry.hub.docker.com/u/djbnjack/jmdocker/trigger/03982662-6e22-479f-bfda-2d04137febe5/
+  - curl --data "build=true" -X POST https://registry.hub.docker.com/u/witlox/cumulonimbi/trigger/a22cd358-625e-411e-9d31-5ac8d2e7fdfb/
 # speed up build
 sudo: false
