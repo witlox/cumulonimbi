@@ -66,17 +66,16 @@ if __name__ == "__main__":
     if api.config['REPOSITORY'] is None:
         api.config['REPOSITORY'] = JobManagerRepository()
 
-    if api.debug is not True:
-        import logging
-        from logging.handlers import RotatingFileHandler
-        formatter = logging.Formatter("%(asctime)s[%(levelname)s](%(lineno)s-%(funcName)s()):%(message)s")
-        file_handler = RotatingFileHandler('jobmanager_api.log', maxBytes=1024 * 1024 * 100, backupCount=20)
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
-        logstash_handler = logstash.LogstashHandler(host, 9200, version=1)
-        logstash_handler.setLevel(logging.INFO)
-        logstash_handler.setFormatter(formatter)
-        api.logger.addHandler(file_handler)
-        api.logger.addHandler(logstash_handler)
+    import logging
+    from logging.handlers import RotatingFileHandler
+    formatter = logging.Formatter("%(asctime)s[%(levelname)s](%(lineno)s-%(funcName)s()):%(message)s")
+    file_handler = RotatingFileHandler('jobmanager_api.log', maxBytes=1024 * 1024 * 100, backupCount=20)
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+    logstash_handler = logstash.LogstashHandler(host, 9200, version=1)
+    logstash_handler.setLevel(logging.INFO)
+    logstash_handler.setFormatter(formatter)
+    api.logger.addHandler(file_handler)
+    api.logger.addHandler(logstash_handler)
 
-    api.run(host='0.0.0.0')
+    api.run(host='0.0.0.0', debug=True)
