@@ -11,11 +11,11 @@ echo "Getting and starting the containers"
 docker pull pblittle/docker-logstash
 docker run -d --net=host --name="elk" pblittle/docker-logstash
 
-docker pull djbnjack/mongobase && echo "\tMongobase pull OK" || echo "\tMongobase Failed"
-docker run -d --net=host --name="mongodb" djbnjack/mongobase && echo "\tMongobase run  OK" || echo "\tMongobase Failed"
+docker pull djbnjack/mongobase
+docker run -d --net=host --name="mongodb" djbnjack/mongobase
 
-docker pull witlox/cumulonimbi && echo "\tJMDocker pull  OK" || echo "\tJMDocker Failed"
-docker run -d --net=host --name="jobmanager" witlox/cumulonimbi python cumulonimbi/job_manager/api.py && echo "\tJMDocker run   OK" || echo "\tJMDocker Failed"
+docker pull witlox/cumulonimbi
+docker run -d --net=host --name="jobmanager" witlox/cumulonimbi python cumulonimbi/job_manager/api.py
 
 #echo "Images in system:"
 #docker images
