@@ -14,6 +14,9 @@ docker run -d --net=host --name="elk" pblittle/docker-logstash
 docker pull djbnjack/mongobase
 docker run -d --net=host --name="mongodb" djbnjack/mongobase
 
+echo "Waiting 60 seconds for logstash to start"
+sleep 60
+
 docker pull witlox/cumulonimbi
 docker run -d --net=host --name="jobmanager" witlox/cumulonimbi python cumulonimbi/job_manager/api.py
 
