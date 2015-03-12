@@ -33,7 +33,7 @@ class Cumulonimbi:
 
     def parse_arguments (self) :
 
-        parser = argparse.ArgumentParser(description='Test Bench Version 3, test runner for black box tests.')
+        parser = argparse.ArgumentParser(description='Cumulonimbi Scheduler.')
 
         # Compulsory arguments
         run_mode_group = parser.add_mutually_exclusive_group(required=True)
