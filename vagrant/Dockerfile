@@ -15,6 +15,9 @@ RUN apt-get update
 RUN apt-get install python-pip -y
 RUN apt-get install git -y
 
+# Install beaver
+RUN pip install beaver
+
 # Get the repository
 RUN git clone https://github.com/witlox/cumulonimbi.git
 

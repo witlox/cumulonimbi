@@ -26,5 +26,8 @@ docker run -d --net=host --name="jobmanager" witlox/cumulonimbi python cumulonim
 echo "Waiting 15 seconds for the api to start"
 sleep 15
 
+echo "Starting logstash transmitter on the api"
+docker exec -d jobmanager beaver -c cumulonimbi/beaver.ini -t http
+
 echo "Running integration tests"
 docker run -i --rm --net=host --name="integrationtests" witlox/cumulonimbi nosetests cumulonimbi/tests/integrationtests
