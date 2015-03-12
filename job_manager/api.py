@@ -9,30 +9,16 @@ if __name__ == '__main__' and __package__ is None:
 from bson.json_util import dumps
 from job_manager.repository import JobManagerRepository
 from flask import Flask, Response, request
-import logstash
-import logging
-from logging.handlers import RotatingFileHandler
+from settings import Settings
 
-
-host = 'localhost'
 
 """
 This is the main api for the job manager, entry point to Cumulonimbi
 """
-api = Flask(__name__, instance_relative_config=True, )
-formatter = logging.Formatter("%(asctime)s[%(levelname)s](%(lineno)s-%(funcName)s()):%(message)s")
-file_handler = RotatingFileHandler('jobmanager_api.log', maxBytes=1024 * 1024 * 100, backupCount=20)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
-logstash_handler = logstash.LogstashHandler(host, 9200, version=1)
-logstash_handler.setLevel(logging.INFO)
-logstash_handler.setFormatter(formatter)
-api.logger.addHandler(file_handler)
-api.logger.addHandler(logstash_handler)
+api = Flask(__name__, instance_relative_config=True)
 
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
-    api.logger.warn("GET /jobs")
     repository = api.config['REPOSITORY']
     response = dumps(repository.get_all_jobs())
     return Response(response, mimetype='application/json')
@@ -71,10 +57,13 @@ def delete_job(job_id):
 
 
 if __name__ == "__main__":
+    settings = Settings()
+    settings.configure_logging()
+
     REPOSITORY = None
     api.config.from_object(__name__)
     api.config.from_pyfile('../../cumulonimbi.jm.py', silent=True)
     if api.config['REPOSITORY'] is None:
         api.config['REPOSITORY'] = JobManagerRepository()
 
-    api.run(host='0.0.0.0')
+    api.run(host='0.0.0.0', debug=settings.debug)
