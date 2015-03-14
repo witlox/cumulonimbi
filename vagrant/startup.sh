@@ -14,20 +14,20 @@ docker run -d --net=host --name="elk" pblittle/docker-logstash
 docker pull djbnjack/mongobase
 docker run -d --net=host --name="mongodb" djbnjack/mongobase
 
-echo "Waiting 60 seconds for logstash to start"
-sleep 60
-
 docker pull witlox/cumulonimbi
 docker run -d --net=host --name="jobmanager" witlox/cumulonimbi python cumulonimbi/job_manager/api.py
 
-#echo "Images in system:"
-#docker images
+echo "Waiting for logstash and the api to start."
+until $(curl --output /dev/null --silent --head --fail http://localhost:9200); do
+    printf '.'
+    sleep 10
+done
+until $(curl --output /dev/null --silent --head --fail http://localhost:5000/jobs); do
+    printf '.'
+    sleep 10
+done
+echo "All up!"
 
-echo "Waiting 15 seconds for the api to start"
-sleep 15
-
-echo "Starting logstash transmitter on the api"
+echo "Starting logstash transmitter on the api and running integration tests"
 docker exec -d jobmanager beaver -c cumulonimbi/beaver.ini -t http
-
-echo "Running integration tests"
 docker run -i --rm --net=host --name="integrationtests" witlox/cumulonimbi nosetests cumulonimbi/tests/integrationtests
