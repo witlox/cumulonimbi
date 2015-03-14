@@ -12,8 +12,7 @@ CMD ["/sbin/my_init"]
 
 # Install git
 RUN apt-get update
-RUN apt-get install python-pip -y
-RUN apt-get install git -y
+RUN apt-get install python-pip git python-dev-all -y
 
 # Install beaver
 RUN pip install beaver
@@ -25,4 +24,5 @@ RUN git clone https://github.com/witlox/cumulonimbi.git
 RUN pip install -r cumulonimbi/requirements.txt
 
 # Clean up APT when done.
+RUN apt-get purge --auto-remove binutils build-essential
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
