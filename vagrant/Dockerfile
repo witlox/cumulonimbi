@@ -12,7 +12,7 @@ CMD ["/sbin/my_init"]
 
 # Install git
 RUN apt-get update
-RUN apt-get install python-pip git python-dev-all -y
+RUN apt-get install python-pip git python-dev -y
 
 # Install beaver
 RUN pip install beaver
