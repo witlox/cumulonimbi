@@ -24,5 +24,5 @@ RUN git clone https://github.com/witlox/cumulonimbi.git
 RUN pip install -r cumulonimbi/requirements.txt
 
 # Clean up APT when done.
-RUN apt-get purge --auto-remove binutils build-essential -y
+RUN apt-get purge --auto-remove binutils build-essential fakeroot libalgorithm-diff-perl libalgorithm-diff-xs-perl libalgorithm-merge-perl libasan0 libatomic1 libc-dev-bin libc6-dev libcloog-isl4 libdpkg-perl libfakeroot libfile-fcntllock-perl libgcc-4.8-dev git -y
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
