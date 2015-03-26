@@ -9,7 +9,7 @@ fi
 
 echo "Getting and starting the containers"
 docker pull pblittle/docker-logstash
-docker run -d --net=host --name="elk" pblittle/docker-logstash
+docker run -d -e LOGSTASH_CONFIG_URL=https://raw.githubusercontent.com/witlox/cumulonimbi/master/vagrant/logstash.conf --net=host --name="elk" pblittle/docker-logstash
 
 docker pull djbnjack/mongobase
 docker run -d --net=host --name="mongodb" djbnjack/mongobase
@@ -29,5 +29,5 @@ done
 echo "All up!"
 
 echo "Starting logstash transmitter on the api and running integration tests"
-docker exec -d jobmanager beaver -c cumulonimbi/beaver.ini -t http
+#docker exec -d jobmanager beaver -c cumulonimbi/beaver.ini -t http
 docker run -i --rm --net=host --name="integrationtests" witlox/cumulonimbi nosetests cumulonimbi/tests/integrationtests

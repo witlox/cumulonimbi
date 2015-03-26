@@ -4,3 +4,4 @@ mock
 flask
 requests
 nose
+python-logstash
