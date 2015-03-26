@@ -28,6 +28,5 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:5000/job
 done
 echo "All up!"
 
-echo "Starting logstash transmitter on the api and running integration tests"
-#docker exec -d jobmanager beaver -c cumulonimbi/beaver.ini -t http
+echo "Running integration tests"
 docker run -i --rm --net=host --name="integrationtests" witlox/cumulonimbi nosetests cumulonimbi/tests/integrationtests
