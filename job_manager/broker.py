@@ -3,13 +3,13 @@ from threading import Thread
 import threading
 from settings import Settings
 
-__author__ = 'johannes.bertens'
-
 import zmq
 
 
 class StoppableThread(Thread):
-    """Thread class with a stop() method. The thread itself has to check regularly for the stopped() condition."""
+    """
+    Thread class with a stop() method. The thread itself has to check regularly for the stopped() condition.
+    """
 
     def __init__(self):
         super(StoppableThread, self).__init__()
@@ -23,12 +23,19 @@ class StoppableThread(Thread):
 
 
 class Broker(StoppableThread):
+
+    """
+    Broker that receives Jobs, and queue's them for use by a worker
+    """
+
     def __init__(self):
         StoppableThread.__init__(self)
         self.daemon = True
-        # Prepare our context and sockets
+        # load settings
         settings = Settings()
-        context = zmq.Context()
+        # prepare context
+        context = zmq.Context.instance()
+        # connect sockets
         self.frontend = context.socket(zmq.ROUTER)
         self.backend = context.socket(zmq.DEALER)
         self.frontend.bind("tcp://*:%d" % settings.job_manager_router_port)
@@ -40,8 +47,9 @@ class Broker(StoppableThread):
         poller.register(self.frontend, zmq.POLLIN)
         poller.register(self.backend, zmq.POLLIN)
 
-        # Switch messages between sockets
+        # dislike of unstoppable threads
         while not self.stopped():
+            # Switch messages between sockets
             socks = dict(poller.poll())
 
             if socks.get(self.frontend) == zmq.POLLIN:

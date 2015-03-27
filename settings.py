@@ -3,7 +3,11 @@ from logging.config import dictConfig, logging
 
 
 class Settings(object):
-    debug = False
+    """
+    This class contains all settings for the cumulonimbi project
+    """
+
+    debug = False  # sets all debug options to on (also for internal debuggers of external libraries)
     project_root = os.path.abspath(os.path.dirname(__file__))
 
     job_manager_api = "localhost"
@@ -18,7 +22,11 @@ class Settings(object):
     log_stash_host = 'localhost'
     log_stash_port = 9300
 
-    def configure_logging(self, file_name):
+    def configure_logging(self, file_path):
+        """
+        Configure logging per instance, set the file path for the rotating file logger
+        """
+
         logging_config = {
             'version': 1,
             'disable_existing_loggers': False,
@@ -30,7 +38,7 @@ class Settings(object):
                 'fh': {'class': 'logging.handlers.RotatingFileHandler',
                        'formatter': 'standard',
                        'level': self.log_file_level,
-                       'filename': file_name,
+                       'filename': file_path,
                        'mode': 'a',
                        'maxBytes': self.log_file_size,
                        'backupCount': self.log_file_rotate},
@@ -48,4 +56,5 @@ class Settings(object):
             }
         }
         dictConfig(logging_config)
+        # always send an initial debug message so we can see if the logger is working as desired
         logging.debug('logging configured')

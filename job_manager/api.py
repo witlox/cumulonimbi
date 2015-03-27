@@ -1,6 +1,6 @@
-__author__ = 'Johannes'
-
-""" This is needed for 2.x and 3.x compatibility regarding imports """
+"""
+This is needed for 2.x and 3.x compatibility regarding imports
+"""
 if __name__ == '__main__' and __package__ is None:
     from os import sys, path
 
@@ -65,24 +65,32 @@ def delete_job(job_id):
 
 
 if __name__ == "__main__":
+    """
+    Run the JobManager API from here with the configured settings
+    """
+
     settings = Settings()
     settings.configure_logging('../logs/job_manager.log')
 
-    #  Prepare our context and sockets
-    context = zmq.Context()
+    # prepare our context and sockets
+    context = zmq.Context.instance()
     socket = context.socket(zmq.REQ)
     socket.connect('tcp://%s:%d' % (settings.job_manager_api, settings.job_manager_router_port))
 
+    # configure storage
     REPOSITORY = None
     api.config.from_object(__name__)
     api.config.from_pyfile('../../cumulonimbi.jm.py', silent=True)
     if api.config['REPOSITORY'] is None:
         api.config['REPOSITORY'] = JobManagerRepository()
 
+    # start non-blocking queue
     broker = Broker()
     broker.start()
 
+    # start flask
     api.run(host='%s' % settings.job_manager_api, debug=settings.debug)
 
+    # cleanup
     broker.stop()
     broker.join()
