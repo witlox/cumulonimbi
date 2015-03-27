@@ -1,3 +1,6 @@
+import logging
+from pymongo.errors import ConnectionFailure
+
 __author__ = 'Johannes'
 
 from pymongo import MongoClient
@@ -7,7 +10,13 @@ class JobManagerRepository():
     def __init__(self, collection=None):
         if collection is None:
             collection = "jobs"
-        self.client = MongoClient('127.0.0.1', 27017)
+
+        try:
+            self.client = MongoClient('127.0.0.1', 27017)
+        except ConnectionFailure(str):
+            logging.error("Cannot connect with the MongoDB server: " + str)
+            raise
+
         self.jobs = self.client.job_manager[collection]
 
     def get_all_jobs(self):

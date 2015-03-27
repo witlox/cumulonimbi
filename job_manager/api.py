@@ -1,3 +1,5 @@
+import logging
+
 __author__ = 'Johannes'
 
 """ This is needed for 2.x and 3.x compatibility regarding imports """
@@ -6,11 +8,17 @@ if __name__ == '__main__' and __package__ is None:
 
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
+from job_manager.broker import Broker
 from bson.json_util import dumps
 from job_manager.repository import JobManagerRepository
 from flask import Flask, Response, request
 from settings import Settings
+import zmq
 
+#  Prepare our context and sockets
+context = zmq.Context()
+socket = context.socket(zmq.REQ)
+socket.connect("tcp://localhost:5559")
 
 """
 This is the main api for the job manager, entry point to Cumulonimbi
@@ -34,6 +42,8 @@ def create_job():
     job_name = request.form['jobname']
     repository = api.config['REPOSITORY']
     response = {'job_id': repository.insert_job(job_name)}
+    socket.send(b"Hello")
+    socket.recv_string()
     return Response(dumps(response), mimetype='application/json')
 
 
@@ -66,4 +76,10 @@ if __name__ == "__main__":
     if api.config['REPOSITORY'] is None:
         api.config['REPOSITORY'] = JobManagerRepository()
 
+    broker = Broker()
+    broker.start()
+
     api.run(host='0.0.0.0', debug=settings.debug)
+
+    broker.stop()
+    broker.join()

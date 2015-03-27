@@ -5,3 +5,4 @@ flask
 requests
 nose
 python-logstash
+zmq
