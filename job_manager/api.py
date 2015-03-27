@@ -19,6 +19,11 @@ This is the main api for the job manager, entry point to Cumulonimbi
 """
 api = Flask(__name__, instance_relative_config=True)
 
+"""
+Define the ZMQ socket as not initialized
+"""
+socket = None
+
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
     repository = api.config['REPOSITORY']
@@ -36,8 +41,9 @@ def create_job():
     job_name = request.form['jobname']
     repository = api.config['REPOSITORY']
     response = {'job_id': repository.insert_job(job_name)}
-    socket.send(b"Hello")
-    socket.recv_string()
+    if socket:
+        socket.send(b"Hello")
+        socket.recv()
     return Response(dumps(response), mimetype='application/json')
 
 @api.route('/jobs/<job_id>', methods=['PUT'])
