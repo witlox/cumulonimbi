@@ -1,5 +1,3 @@
-import logging
-
 __author__ = 'Johannes'
 
 """ This is needed for 2.x and 3.x compatibility regarding imports """
@@ -15,10 +13,6 @@ from flask import Flask, Response, request
 from settings import Settings
 import zmq
 
-#  Prepare our context and sockets
-context = zmq.Context()
-socket = context.socket(zmq.REQ)
-socket.connect("tcp://localhost:5559")
 
 """
 This is the main api for the job manager, entry point to Cumulonimbi
@@ -46,11 +40,9 @@ def create_job():
     socket.recv_string()
     return Response(dumps(response), mimetype='application/json')
 
-
 @api.route('/jobs/<job_id>', methods=['PUT'])
 def edit_job(job_id):
     pass
-
 
 @api.route('/jobs/<job_id>', methods=['GET'])
 def get_job(job_id):
@@ -68,7 +60,12 @@ def delete_job(job_id):
 
 if __name__ == "__main__":
     settings = Settings()
-    settings.configure_logging()
+    settings.configure_logging('../logs/job_manager.log')
+
+    #  Prepare our context and sockets
+    context = zmq.Context()
+    socket = context.socket(zmq.REQ)
+    socket.connect('tcp://%s:%d' % (settings.job_manager_api, settings.job_manager_router_port))
 
     REPOSITORY = None
     api.config.from_object(__name__)
@@ -79,7 +76,7 @@ if __name__ == "__main__":
     broker = Broker()
     broker.start()
 
-    api.run(host='0.0.0.0', debug=settings.debug)
+    api.run(host='%s' % settings.job_manager_api, debug=settings.debug)
 
     broker.stop()
     broker.join()

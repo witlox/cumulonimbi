@@ -4,12 +4,12 @@ import zmq
 import logging
 from settings import Settings
 
+settings = Settings()
+settings.configure_logging('../logs/task_manager.log')
+
 context = zmq.Context()
 socket = context.socket(zmq.REP)
-socket.connect("tcp://localhost:5560")
-
-settings = Settings()
-settings.configure_logging()
+socket.connect('tcp://%s:%d' % (settings.job_manager_api, settings.job_manager_dealer_port))
 
 while True:
     message = socket.recv()

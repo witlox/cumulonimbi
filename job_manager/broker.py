@@ -1,6 +1,7 @@
 import logging
 from threading import Thread
 import threading
+from settings import Settings
 
 __author__ = 'johannes.bertens'
 
@@ -8,8 +9,7 @@ import zmq
 
 
 class StoppableThread(Thread):
-    """Thread class with a stop() method. The thread itself has to check
-    regularly for the stopped() condition."""
+    """Thread class with a stop() method. The thread itself has to check regularly for the stopped() condition."""
 
     def __init__(self):
         super(StoppableThread, self).__init__()
@@ -26,14 +26,13 @@ class Broker(StoppableThread):
     def __init__(self):
         StoppableThread.__init__(self)
         self.daemon = True
-
         # Prepare our context and sockets
+        settings = Settings()
         context = zmq.Context()
         self.frontend = context.socket(zmq.ROUTER)
         self.backend = context.socket(zmq.DEALER)
-        self.frontend.bind("tcp://*:5559")
-        self.backend.bind("tcp://*:5560")
-
+        self.frontend.bind("tcp://*:%d" % settings.job_manager_router_port)
+        self.backend.bind("tcp://*:%d" % settings.job_manager_dealer_port)
 
     def run(self):
         # Initialize poll set
