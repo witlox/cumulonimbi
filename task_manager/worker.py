@@ -1,3 +1,4 @@
+from time import sleep
 import zmq
 import logging
 from settings import Settings
@@ -13,3 +14,5 @@ while True:
     message = socket.recv()
     logging.info("Received request: %s" % message)
     socket.send(b"World")
+    sleep(5)
+    logging.info("Done with request %s" % message)

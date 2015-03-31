@@ -1,5 +1,3 @@
-__author__ = 'Johannes'
-
 import subprocess as p
 import networkx as nx
 

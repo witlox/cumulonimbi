@@ -5,7 +5,7 @@ This is needed for 2.x and 3.x compatibility regarding imports
 from job_manager.broker import Broker
 from bson.json_util import dumps
 from job_manager.repository import JobManagerRepository
-from flask import Flask, Response, request
+from flask import Flask, Response, request, jsonify
 from settings import Settings
 from os import path
 import zmq
@@ -41,15 +41,25 @@ def create_job():
     job_name = request.form['jobname']
     repository = api.config['REPOSITORY']
     response = {'job_id': repository.insert_job(job_name)}
-    if socket:
-        socket.send(b"Hello")
-        socket.recv()
+    if api.socket:
+        api.socket.send(b"Hello")
+        api.socket.recv()
     return Response(dumps(response), mimetype='application/json')
 
 
 @api.route('/jobs/<job_id>', methods=['PUT'])
 def edit_job(job_id):
-    pass
+    repository = api.config['REPOSITORY']
+    try:
+        repository.update_job(job_id)
+    except Exception, e:
+        response = jsonify(message=str(e))
+        response.status_code = 500
+        return Response(response, mimetype='application/json')
+
+    response = jsonify(message="OK")
+    response.status_code = 200
+    return Response(response, mimetype='application/json')
 
 
 @api.route('/jobs/<job_id>', methods=['GET'])
@@ -77,8 +87,8 @@ def start():
 
     # prepare our context and sockets
     context = zmq.Context.instance()
-    socket = context.socket(zmq.REQ)
-    socket.connect('tcp://%s:%d' % (settings.job_manager_api, settings.job_manager_router_port))
+    api.socket = context.socket(zmq.REQ)
+    api.socket.connect('tcp://%s:%d' % (settings.job_manager_api, settings.job_manager_router_port))
 
     # configure storage
     api.config['REPOSITORY'] = settings.repository

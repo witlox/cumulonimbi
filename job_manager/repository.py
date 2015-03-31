@@ -30,6 +30,9 @@ class JobManagerRepository():
         job_id = str(self.jobs.insert({'name': job_name}))
         return job_id
 
+    def update_job(self, job_id, status):
+        self.jobs.update({"_id": ObjectId(job_id)}, {"status": status})
+
     def get_job(self, job_id):
         job = self.jobs.find_one({"_id": ObjectId(job_id)})
         return job
