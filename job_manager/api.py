@@ -19,7 +19,7 @@ api = Flask(__name__, instance_relative_config=True)
 """
 Define the ZMQ socket as not initialized
 """
-socket = None
+api.socket = None
 
 
 @api.route('/jobs', methods=['GET'])
