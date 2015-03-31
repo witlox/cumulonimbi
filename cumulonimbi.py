@@ -1,14 +1,14 @@
-
-__author__ = 'witlox'
-
 import argparse
 import logging
 from settings import Settings
 from job_manager.repository import JobManagerRepository
 import job_manager.api as jmapi
+from os import path
+
+""" This is the starting class for all Cumulonimbi. """
+
 
 class Cumulonimbi:
-
     args = None
     settings = None
 
@@ -31,33 +31,33 @@ class Cumulonimbi:
         except Exception, e:
             logging.error(e)
 
-    def parse_arguments (self) :
+    def parse_arguments(self):
 
         parser = argparse.ArgumentParser(description='Cumulonimbi Scheduler.')
 
         # Compulsory arguments
         run_mode_group = parser.add_mutually_exclusive_group(required=True)
         run_mode_group.add_argument("-a", "--all",
-                                  help="Launch all modules: job manager, task manager, ...",
-                                  dest="run_mode",
-                                  action="store_const",
-                                  const="all")
+                                    help="Launch all modules: job manager, task manager, ...",
+                                    dest="run_mode",
+                                    action="store_const",
+                                    const="all")
         run_mode_group.add_argument("-jm", "--job-manager",
-                                  help="Launch job manager",
-                                  dest="run_mode",
-                                  action="store_const",
-                                  const="jm")
+                                    help="Launch job manager",
+                                    dest="run_mode",
+                                    action="store_const",
+                                    const="jm")
         run_mode_group.add_argument("-tm", "--task-manager",
-                                  help="Launch task manager",
-                                  dest="run_mode",
-                                  action="store_const",
-                                  const="tm")
+                                    help="Launch task manager",
+                                    dest="run_mode",
+                                    action="store_const",
+                                    const="tm")
 
         # Optional arguments
         parser.add_argument("--log-level",
-                          default="",
-                          help="CRITICAL, ERROR, WARNING, INFO or DEBUG",
-                          dest="loglevel")
+                            default="",
+                            help="CRITICAL, ERROR, WARNING, INFO or DEBUG",
+                            dest="loglevel")
 
         # Start parsing
         self.args = parser.parse_args()
@@ -78,7 +78,7 @@ class Cumulonimbi:
 
     def start_job_manager(self):
         jmapi.api.config.from_object(__name__)
-        jmapi.api.config.from_pyfile('../../cumulonimbi.jm.py', silent=True)
+        jmapi.api.config.from_pyfile(path.dirname(path.abspath(__file__)) + '../cumulonimbi.jm.py', silent=True)
         if jmapi.api.config['REPOSITORY'] is None:
             jmapi.api.config['REPOSITORY'] = JobManagerRepository()
         jmapi.api.run(host='0.0.0.0', debug=self.settings.debug)

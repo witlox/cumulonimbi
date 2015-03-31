@@ -24,17 +24,20 @@ Define the ZMQ socket as not initialized
 """
 socket = None
 
+
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
     repository = api.config['REPOSITORY']
     response = dumps(repository.get_all_jobs())
     return Response(response, mimetype='application/json')
 
+
 @api.route('/jobs', methods=['DELETE'])
 def delete_jobs():
     repository = api.config['REPOSITORY']
     response = dumps(repository.delete_all_jobs())
     return Response(response, mimetype='application/json')
+
 
 @api.route('/jobs', methods=['POST'])
 def create_job():
@@ -46,9 +49,11 @@ def create_job():
         socket.recv()
     return Response(dumps(response), mimetype='application/json')
 
+
 @api.route('/jobs/<job_id>', methods=['PUT'])
 def edit_job(job_id):
     pass
+
 
 @api.route('/jobs/<job_id>', methods=['GET'])
 def get_job(job_id):
@@ -70,7 +75,8 @@ if __name__ == "__main__":
     """
 
     settings = Settings()
-    settings.configure_logging('../logs/job_manager.log')
+    logfile = path.dirname(path.dirname(path.abspath(__file__))) + '/logs/job_manager.log'
+    settings.configure_logging(logfile)
 
     # prepare our context and sockets
     context = zmq.Context.instance()
@@ -80,7 +86,7 @@ if __name__ == "__main__":
     # configure storage
     REPOSITORY = None
     api.config.from_object(__name__)
-    api.config.from_pyfile('../../cumulonimbi.jm.py', silent=True)
+    api.config.from_pyfile(path.dirname(path.dirname(path.abspath(__file__))) + '../cumulonimbi.jm.py', silent=True)
     if api.config['REPOSITORY'] is None:
         api.config['REPOSITORY'] = JobManagerRepository()
 
