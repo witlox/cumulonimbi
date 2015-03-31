@@ -1,9 +1,9 @@
 import argparse
 import logging
-from settings import Settings
-from job_manager.repository import JobManagerRepository
-import job_manager.api as jmapi
 from os import path
+from settings import Settings
+import job_manager.api as jmapi
+
 
 """ This is the starting class for all Cumulonimbi. """
 
@@ -14,12 +14,14 @@ class Cumulonimbi:
 
     def __init__(self):
         settings = Settings()
-        settings.configure_logging()
+        logfile = path.dirname(path.abspath(__file__)) + '/logs/job_manager.log'
+        settings.configure_logging(logfile)
 
     def run(self):
         # Parse command line arguments.
         self.parse_arguments()
         try:
+            print "Runmode: %s" % self.args.__dict__["run_mode"]
             # Determine type of run
             if self.args.__dict__["run_mode"] == "all":
                 self.start_job_manager()
@@ -30,6 +32,7 @@ class Cumulonimbi:
 
         except Exception, e:
             logging.error(e)
+            raise
 
     def parse_arguments(self):
 
@@ -77,12 +80,7 @@ class Cumulonimbi:
 
 
     def start_job_manager(self):
-        jmapi.api.config.from_object(__name__)
-        jmapi.api.config.from_pyfile(path.dirname(path.abspath(__file__)) + '../cumulonimbi.jm.py', silent=True)
-        if jmapi.api.config['REPOSITORY'] is None:
-            jmapi.api.config['REPOSITORY'] = JobManagerRepository()
-        jmapi.api.run(host='0.0.0.0', debug=self.settings.debug)
-
+        jmapi.start()
 
 if __name__ == "__main__":
     Cumulonimbi().run()

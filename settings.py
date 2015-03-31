@@ -11,6 +11,8 @@ class Settings(object):
     project_root = os.path.abspath(os.path.dirname(__file__))
 
     job_manager_api = "localhost"
+    job_manager_mongo_client_host = '127.0.0.1'
+    job_manager_mongo_client_port = 27017
     job_manager_router_port = 5559
     job_manager_dealer_port = 5560
 
@@ -21,6 +23,8 @@ class Settings(object):
     log_stash_level = 'INFO'
     log_stash_host = 'localhost'
     log_stash_port = 9300
+
+    repository = None
 
     def configure_logging(self, file_path):
         """

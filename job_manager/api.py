@@ -1,16 +1,13 @@
 """
 This is needed for 2.x and 3.x compatibility regarding imports
 """
-if __name__ == '__main__' and __package__ is None:
-    from os import sys, path
-
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
 from job_manager.broker import Broker
 from bson.json_util import dumps
 from job_manager.repository import JobManagerRepository
 from flask import Flask, Response, request
 from settings import Settings
+from os import path
 import zmq
 
 
@@ -69,7 +66,7 @@ def delete_job(job_id):
     return Response(dumps(response), mimetype='application/json')
 
 
-if __name__ == "__main__":
+def start():
     """
     Run the JobManager API from here with the configured settings
     """
@@ -84,18 +81,17 @@ if __name__ == "__main__":
     socket.connect('tcp://%s:%d' % (settings.job_manager_api, settings.job_manager_router_port))
 
     # configure storage
-    REPOSITORY = None
-    api.config.from_object(__name__)
-    api.config.from_pyfile(path.dirname(path.dirname(path.abspath(__file__))) + '../cumulonimbi.jm.py', silent=True)
+    api.config['REPOSITORY'] = settings.repository
     if api.config['REPOSITORY'] is None:
         api.config['REPOSITORY'] = JobManagerRepository()
+    api.run(host=settings.job_manager_api, debug=settings.debug)
 
     # start non-blocking queue
     broker = Broker()
     broker.start()
 
     # start flask
-    api.run(host='%s' % settings.job_manager_api, debug=settings.debug)
+    api.run(host=settings.job_manager_api, debug=settings.debug)
 
     # cleanup
     broker.stop()
