@@ -17,10 +17,9 @@ This is the main api for the job manager, entry point to Cumulonimbi
 api = Flask(__name__, instance_relative_config=True)
 
 """
-Define the ZMQ socket as not initialized
+Create placeholder for broker with message queue
 """
-api.socket = None
-
+api.broker = None
 
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
@@ -41,9 +40,8 @@ def create_job():
     job_name = request.form['jobname']
     repository = api.config['REPOSITORY']
     response = {'job_id': repository.insert_job(job_name)}
-    if api.socket:
-        api.socket.send(b"Hello")
-        api.socket.recv()
+    if api.broker:
+        api.broker.put_on_queue(job_name)
     return Response(dumps(response), mimetype='application/json')
 
 
@@ -60,6 +58,7 @@ def edit_job(job_id):
     response = jsonify(message="OK")
     response.status_code = 200
     return Response(response, mimetype='application/json')
+
 
 
 @api.route('/jobs/<job_id>', methods=['GET'])
@@ -79,16 +78,11 @@ def delete_job(job_id):
 def start():
     """
     Run the JobManager API from here with the configured settings
+    This is a blocking call
     """
-
     settings = Settings()
     logfile = path.dirname(path.dirname(path.abspath(__file__))) + '/logs/job_manager.log'
     settings.configure_logging(logfile)
-
-    # prepare our context and sockets
-    context = zmq.Context.instance()
-    api.socket = context.socket(zmq.REQ)
-    api.socket.connect('tcp://%s:%d' % (settings.job_manager_api, settings.job_manager_router_port))
 
     # configure storage
     api.config['REPOSITORY'] = settings.repository
@@ -96,13 +90,13 @@ def start():
         api.config['REPOSITORY'] = JobManagerRepository()
     api.run(host=settings.job_manager_api, debug=settings.debug)
 
-    # start non-blocking queue
-    broker = Broker()
-    broker.start()
+    # start non-blocking broker with queue
+    api.broker = Broker()
+    api.broker.start()
 
     # start flask
     api.run(host=settings.job_manager_api, debug=settings.debug)
 
     # cleanup
-    broker.stop()
-    broker.join()
+    api.broker.stop()
+    api.broker.join()

@@ -14,7 +14,6 @@ class Settings(object):
     job_manager_mongo_client_host = '127.0.0.1'
     job_manager_mongo_client_port = 27017
     job_manager_router_port = 5559
-    job_manager_dealer_port = 5560
 
     log_file_level = 'DEBUG'
     log_file_size = 1024 * 1024 * 100
