@@ -1,10 +1,15 @@
+# python 2 <-> 3 compatibility
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
+
 import logging
 import threading
 import time
 import zmq
 
 from collections import OrderedDict
-from Queue import Queue
 from threading import Thread
 from settings import Settings
 
@@ -40,7 +45,6 @@ class WorkerQueue(object):
             if t > worker.expiry:  # Worker expired
                 expired.append(address)
         for address in expired:
-            logging.warn('Idle worker expired: %s' % address)
             self.queue.pop(address, None)
 
     def next(self):
