@@ -40,7 +40,7 @@ class WorkerQueue(object):
             if t > worker.expiry:  # Worker expired
                 expired.append(address)
         for address in expired:
-            print "W: Idle worker expired: %s" % address
+            logging.warn('Idle worker expired: %s' % address)
             self.queue.pop(address, None)
 
     def next(self):
