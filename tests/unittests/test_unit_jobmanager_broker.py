@@ -60,18 +60,18 @@ class TestWorker(StoppableThread):
                     liveliness = HEARTBEAT_LIVELINESS
                     time.sleep(1)  # Do some heavy work
                 elif len(frames) == 1 and frames[0] == PPP_HEARTBEAT:
-                    print 'Queue heartbeat'
+                    print('Queue heartbeat')
                     liveliness = HEARTBEAT_LIVELINESS
                 else:
-                    print 'received message: %s' % frames
+                    print('received message: %s' % frames)
                     self.message = str(frames[0])
                     self.processed = True
                 interval = INTERVAL_INIT
             else:
                 liveliness -= 1
                 if liveliness == 0:
-                    print 'Heartbeat failure, cannot reach queue'
-                    print 'Reconnecting in %d' % str(interval)
+                    print('Heartbeat failure, cannot reach queue')
+                    print('Reconnecting in %d' % str(interval))
                     time.sleep(interval)
                     if interval < INTERVAL_MAX:
                         interval *= 2
@@ -82,7 +82,7 @@ class TestWorker(StoppableThread):
                     liveliness = HEARTBEAT_LIVELINESS
             if time.time() > heartbeat_at:
                 heartbeat_at = time.time() + HEARTBEAT_INTERVAL
-                print 'Worker heartbeat'
+                print('Worker heartbeat')
                 worker.send(PPP_HEARTBEAT)
         worker.close()
         self.context.term()

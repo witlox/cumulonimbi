@@ -30,7 +30,7 @@ class Cumulonimbi:
             elif self.args.__dict__["run_mode"] == "tm":
                 pass
 
-        except Exception, e:
+        except Exception as e:
             logging.error(e)
             raise
 

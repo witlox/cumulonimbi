@@ -2,13 +2,14 @@
 This is needed for 2.x and 3.x compatibility regarding imports
 """
 
-from job_manager.broker import Broker
-from bson.json_util import dumps
-from job_manager.repository import JobManagerRepository
-from flask import Flask, Response, request, jsonify
-from settings import Settings
 from os import path
-import zmq
+
+from bson.json_util import dumps
+from flask import Flask, Response, request, jsonify
+
+from job_manager.broker import Broker
+from job_manager.repository import JobManagerRepository
+from settings import Settings
 
 
 """
@@ -50,7 +51,7 @@ def edit_job(job_id):
     repository = api.config['REPOSITORY']
     try:
         repository.update_job(job_id)
-    except Exception, e:
+    except Exception as e:
         response = jsonify(message=str(e))
         response.status_code = 500
         return Response(response, mimetype='application/json')
