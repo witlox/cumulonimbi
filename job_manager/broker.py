@@ -20,8 +20,8 @@ HEARTBEAT_LIVELINESS = 3   # 3..5 is reasonable
 HEARTBEAT_INTERVAL = 1.0   # Seconds
 
 #  Paranoid Pirate Protocol constants
-PPP_READY = bytes('\x01')      # Signals worker is ready
-PPP_HEARTBEAT = bytes('\x02')  # Signals worker heartbeat
+PPP_READY = bytes('%04X' % 1)      # Signals worker is ready
+PPP_HEARTBEAT = bytes('%04X' % 2)  # Signals worker heartbeat
 
 
 class Worker(object):

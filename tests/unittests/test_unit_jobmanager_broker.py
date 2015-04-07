@@ -15,8 +15,8 @@ INTERVAL_INIT = 1
 INTERVAL_MAX = 32
 
 #  Paranoid Pirate Protocol constants
-PPP_READY = bytes('\x01')      # Signals worker is ready
-PPP_HEARTBEAT = bytes('\x02')  # Signals worker heartbeat
+PPP_READY = bytes('%04X' % 1)      # Signals worker is ready
+PPP_HEARTBEAT = bytes('%04X' % 2)  # Signals worker heartbeat
 
 
 class TestWorker(StoppableThread):
