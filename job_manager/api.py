@@ -50,7 +50,7 @@ def create_job():
 def edit_job(job_id):
     repository = api.config['REPOSITORY']
     try:
-        repository.update_job(job_id)
+        repository.update_job(job_id, 'done')
     except Exception as e:
         response = jsonify(message=str(e))
         response.status_code = 500
