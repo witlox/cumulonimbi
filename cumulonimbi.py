@@ -21,7 +21,7 @@ class Cumulonimbi:
         # Parse command line arguments.
         self.parse_arguments()
         try:
-            print "Runmode: %s" % self.args.__dict__["run_mode"]
+            print("Runmode: %s" % self.args.__dict__["run_mode"])
             # Determine type of run
             if self.args.__dict__["run_mode"] == "all":
                 self.start_job_manager()

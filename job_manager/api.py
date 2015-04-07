@@ -54,11 +54,11 @@ def edit_job(job_id):
     except Exception as e:
         response = jsonify(message=str(e))
         response.status_code = 500
-        return Response(response, mimetype='application/json')
+        return response
 
     response = jsonify(message="OK")
     response.status_code = 200
-    return Response(response, mimetype='application/json')
+    return response
 
 
 
@@ -89,7 +89,7 @@ def start():
     api.config['REPOSITORY'] = settings.repository
     if api.config['REPOSITORY'] is None:
         api.config['REPOSITORY'] = JobManagerRepository()
-    api.run(host=settings.job_manager_api, debug=settings.debug)
+    #api.run(host=settings.job_manager_api, debug=settings.debug)
 
     # start non-blocking broker with queue
     api.broker = Broker()
