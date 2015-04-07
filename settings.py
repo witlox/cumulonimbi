@@ -10,7 +10,7 @@ class Settings(object):
     debug = False  # sets all debug options to on (also for internal debuggers of external libraries)
     project_root = os.path.abspath(os.path.dirname(__file__))
 
-    job_manager_api = "localhost"
+    job_manager_api = "0.0.0.0"
     job_manager_mongo_client_host = '127.0.0.1'
     job_manager_mongo_client_port = 27017
     job_manager_router_port = 5559
