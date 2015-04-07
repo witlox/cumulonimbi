@@ -1,5 +1,4 @@
 # python 2 <-> 3 compatibility
-from __future__ import unicode_literals
 try:
     from Queue import Queue
 except ImportError:
@@ -20,8 +19,8 @@ HEARTBEAT_LIVELINESS = 3   # 3..5 is reasonable
 HEARTBEAT_INTERVAL = 1.0   # Seconds
 
 #  Paranoid Pirate Protocol constants
-PPP_READY = bytes('%04X' % 1)      # Signals worker is ready
-PPP_HEARTBEAT = bytes('%04X' % 2)  # Signals worker heartbeat
+PPP_READY = '\x01'.encode()      # Signals worker is ready
+PPP_HEARTBEAT = '\x02'.encode()  # Signals worker heartbeat
 
 
 class Worker(object):
@@ -42,7 +41,7 @@ class WorkerQueue(object):
         """Look for & kill expired workers."""
         t = time.time()
         expired = []
-        for address,worker in self.queue.iteritems():
+        for address,worker in self.queue.items():
             if t > worker.expiry:  # Worker expired
                 expired.append(address)
         for address in expired:
@@ -122,9 +121,14 @@ class Broker(StoppableThread):
                     heartbeat_at = time.time() + HEARTBEAT_INTERVAL
             # send the work to the queue
             while not self.queue.empty():
-                frames = [workers.next(), bytes(self.queue.get())]
-                self.dealer.send_multipart(frames)
-            workers.purge()
+                qi = self.queue.get()
+                if isinstance(qi, str):
+                    frames = [workers.next(), qi.encode()]
+                    self.dealer.send_multipart(frames)
+                else:
+                    frames = [workers.next(), qi]
+                    self.dealer.send_multipart(frames)
+        workers.purge()
         # out of loop, cleanup connections
         self.dealer.close()
         self.context.term()

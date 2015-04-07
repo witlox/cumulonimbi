@@ -1,6 +1,3 @@
-# python 2 <-> 3 compatibility
-from __future__ import unicode_literals
-
 from random import randint
 import time
 import unittest
@@ -15,8 +12,8 @@ INTERVAL_INIT = 1
 INTERVAL_MAX = 32
 
 #  Paranoid Pirate Protocol constants
-PPP_READY = bytes('%04X' % 1)      # Signals worker is ready
-PPP_HEARTBEAT = bytes('%04X' % 2)  # Signals worker heartbeat
+PPP_READY = '\x01'.encode()      # Signals worker is ready
+PPP_HEARTBEAT = '\x02'.encode()  # Signals worker heartbeat
 
 
 class TestWorker(StoppableThread):
@@ -37,7 +34,7 @@ class TestWorker(StoppableThread):
         """
         worker = self.context.socket(zmq.DEALER)
         identity = '%04X-%04X' % (randint(0, 0x10000), randint(0, 0x10000))
-        worker.setsockopt(zmq.IDENTITY, bytes(identity))
+        worker.setsockopt(zmq.IDENTITY, identity.encode())
         self.poller.register(worker, zmq.POLLIN)
         worker.connect('tcp://%s:%d' % (self.settings.job_manager_api, self.settings.job_manager_router_port))
         worker.send(PPP_READY)
@@ -67,7 +64,7 @@ class TestWorker(StoppableThread):
                     liveliness = HEARTBEAT_LIVELINESS
                 else:
                     print('received message: %s' % frames)
-                    self.message = str(frames[0])
+                    self.message = (frames[0]).decode()
                     self.processed = True
                 interval = INTERVAL_INIT
             else:
