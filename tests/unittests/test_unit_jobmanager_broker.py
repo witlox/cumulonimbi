@@ -1,3 +1,6 @@
+# python 2 <-> 3 compatibility
+from __future__ import unicode_literals
+
 from random import randint
 import time
 import unittest
@@ -12,8 +15,8 @@ INTERVAL_INIT = 1
 INTERVAL_MAX = 32
 
 #  Paranoid Pirate Protocol constants
-PPP_READY = '\x01'      # Signals worker is ready
-PPP_HEARTBEAT = '\x02'  # Signals worker heartbeat
+PPP_READY = bytes('\x01')      # Signals worker is ready
+PPP_HEARTBEAT = bytes('\x02')  # Signals worker heartbeat
 
 
 class TestWorker(StoppableThread):
@@ -71,7 +74,7 @@ class TestWorker(StoppableThread):
                 liveliness -= 1
                 if liveliness == 0:
                     print('Heartbeat failure, cannot reach queue')
-                    print('Reconnecting in %d' % str(interval))
+                    print('Reconnecting in %d' % interval)
                     time.sleep(interval)
                     if interval < INTERVAL_MAX:
                         interval *= 2

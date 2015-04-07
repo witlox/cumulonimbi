@@ -1,4 +1,5 @@
 # python 2 <-> 3 compatibility
+from __future__ import unicode_literals
 try:
     from Queue import Queue
 except ImportError:
@@ -19,8 +20,8 @@ HEARTBEAT_LIVELINESS = 3   # 3..5 is reasonable
 HEARTBEAT_INTERVAL = 1.0   # Seconds
 
 #  Paranoid Pirate Protocol constants
-PPP_READY = '\x01'      # Signals worker is ready
-PPP_HEARTBEAT = '\x02'  # Signals worker heartbeat
+PPP_READY = bytes('\x01')      # Signals worker is ready
+PPP_HEARTBEAT = bytes('\x02')  # Signals worker heartbeat
 
 
 class Worker(object):
@@ -121,7 +122,7 @@ class Broker(StoppableThread):
                     heartbeat_at = time.time() + HEARTBEAT_INTERVAL
             # send the work to the queue
             while not self.queue.empty():
-                frames = [workers.next(), self.queue.get()]
+                frames = [workers.next(), bytes(self.queue.get())]
                 self.dealer.send_multipart(frames)
             workers.purge()
         # out of loop, cleanup connections
