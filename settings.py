@@ -10,7 +10,7 @@ class Settings(object):
     debug = False  # sets all debug options to on (also for internal debuggers of external libraries)
     project_root = os.path.abspath(os.path.dirname(__file__))
 
-    job_manager_api = "0.0.0.0"
+    job_manager_api = "127.0.0.0"
     job_manager_mongo_client_host = '127.0.0.1'
     job_manager_mongo_client_port = 27017
     job_manager_router_port = 5559
@@ -19,7 +19,7 @@ class Settings(object):
     log_file_size = 1024 * 1024 * 100
     log_file_rotate = 10
 
-    log_stash_level = 'DEBUG'
+    log_stash_level = 'INFO'
     log_stash_host = 'localhost'
     log_stash_port = 9300
 
@@ -29,6 +29,10 @@ class Settings(object):
         """
         Configure logging per instance, set the file path for the rotating file logger
         """
+
+        path_dir = os.path.dirname(file_path)
+        if not os.path.exists(path_dir):
+            os.makedirs(path_dir)
 
         logging_config = {
             'version': 1,

@@ -1,5 +1,3 @@
-__author__ = 'Johannes'
-
 from job_manager.repository import JobManagerRepository
 from bson import ObjectId
 import mock

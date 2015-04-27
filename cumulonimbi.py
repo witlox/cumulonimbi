@@ -3,6 +3,7 @@ import logging
 from os import path
 from settings import Settings
 import job_manager.api as jmapi
+import task_manager.worker as tmworker
 
 
 """ This is the starting class for all Cumulonimbi. """
@@ -81,6 +82,9 @@ class Cumulonimbi:
 
     def start_job_manager(self):
         jmapi.start()
+
+    def start_task_manager(self):
+        tmworker.
 
 if __name__ == "__main__":
     Cumulonimbi().run()
