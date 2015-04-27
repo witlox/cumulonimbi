@@ -19,7 +19,7 @@ class Settings(object):
     log_file_size = 1024 * 1024 * 100
     log_file_rotate = 10
 
-    log_stash_level = 'INFO'
+    log_stash_level = 'DEBUG'
     log_stash_host = 'localhost'
     log_stash_port = 9300
 
