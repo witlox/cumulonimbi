@@ -121,4 +121,3 @@ class Broker(Thread):
         workers.purge()
         # out of loop, cleanup connections
         self.dealer.close()
-        self.context.term()

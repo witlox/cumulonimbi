@@ -91,4 +91,3 @@ class Worker(Thread):
 
         # cleanup context
         worker.close()
-        self.context.term()
