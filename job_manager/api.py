@@ -90,7 +90,6 @@ def start():
     api.config['REPOSITORY'] = settings.repository
     if api.config['REPOSITORY'] is None:
         api.config['REPOSITORY'] = JobManagerRepository()
-    #api.run(host=settings.job_manager_api, debug=settings.debug)
 
     # start non-blocking broker with queue
     api.broker = Broker()

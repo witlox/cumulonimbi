@@ -125,4 +125,3 @@ class Broker(StoppableThread):
         workers.purge()
         # out of loop, cleanup connections
         self.dealer.close()
-        self.context.term()

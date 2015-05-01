@@ -104,4 +104,3 @@ class Worker(StoppableThread):
 
         # cleanup context
         worker.close()
-        self.context.term()
