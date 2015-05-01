@@ -13,8 +13,8 @@ class JobManagerIntegrationTests(unittest.TestCase):
         jobs = jm.get_all_jobs()
         assert (len(jobs) == 0)
 
-        id_A = jm.insert_job("A", nx.Graph())
-        id_B = jm.insert_job("B", nx.Graph())
+        id_A = jm.insert_job("A", nx.node_link_data(nx.Graph()))
+        id_B = jm.insert_job("B", nx.node_link_data(nx.Graph()))
 
         jobs = jm.get_all_jobs()
         assert (len(jobs) == 2)
@@ -29,8 +29,8 @@ class JobManagerIntegrationTests(unittest.TestCase):
         jobs = json.loads(body)
         assert (len(jobs) == 0)
 
-        id_A = app.post('/jobs', data=dict(jobname="A", graph=nx.Graph()))
-        id_A = app.post('/jobs', data=dict(jobname="B", graph=nx.Graph()))
+        id_A = app.post('/jobs', data=dict(jobname="A", graph=nx.node_link_data(nx.Graph())))
+        id_A = app.post('/jobs', data=dict(jobname="B", graph=nx.node_link_data(nx.Graph())))
 
         rv = app.get('/jobs')
         body = rv.data.decode(rv.charset)

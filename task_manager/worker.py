@@ -52,7 +52,7 @@ class Worker(StoppableThread):
         worker.setsockopt_string(zmq.IDENTITY, identity)
         poller.register(worker, zmq.POLLIN)
         worker.connect('tcp://%s:%d' % (settings.job_manager_api, settings.job_manager_router_port))
-        worker.send(self.ppp_settings.PPP_READY)
+        worker.send_string(self.ppp_settings.PPP_READY)
         return worker
 
     def run(self):

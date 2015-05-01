@@ -17,7 +17,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(len(jobs) == 0)
 
     def test_add_job(self):
-        data = {'jobname': 'api_job', 'task_graph': nx.Graph()}
+        data = {'jobname': 'api_job', 'task_graph': nx.node_link_data(nx.Graph())}
         r = requests.post(self.jobs_url, data)
         job = r.json()
 
@@ -31,7 +31,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(r.status_code == 500)
 
     def test_update_job_success(self):
-        data = {'jobname': 'api_job', 'task_graph': nx.Graph()}
+        data = {'jobname': 'api_job', 'task_graph': nx.node_link_data(nx.Graph())}
         r = requests.post(self.jobs_url, data)
         job = r.json()
 
@@ -39,7 +39,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(r.status_code == 200)
 
     def test_get_specific_job(self):
-        data = {'jobname': 'api_job', 'task_graph': nx.Graph()}
+        data = {'jobname': 'api_job', 'task_graph': nx.node_link_data(nx.Graph())}
         r = requests.post(self.jobs_url, data)
         job = r.json()
 
@@ -56,7 +56,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         g.add_edge(t1, t2)
         g.add_edge(t2, t3)
 
-        data = {'jobname': 'api_job', 'task_graph': g}
+        data = {'jobname': 'api_job', 'task_graph': nx.node_link_data(g)}
         r = requests.post(self.jobs_url, data)
         assert(r.status_code == 200)
 

@@ -121,7 +121,10 @@ class Broker(StoppableThread):
             while not self.queue.empty():
                 qi = self.queue.get()
                 next_worker = workers.next()
-                if isinstance(qi, str) and next_worker:
+                while not next_worker:
+                    time.sleep(1)
+                    next_worker = workers.next()
+                if isinstance(qi, str):
                     frames = [next_worker, qi.encode()]
                     self.dealer.send_multipart(frames)
                 else:
