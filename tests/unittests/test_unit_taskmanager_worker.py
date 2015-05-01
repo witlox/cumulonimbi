@@ -8,7 +8,7 @@ class TestRepository(unittest.TestCase):
         self.worker.start()
 
     def tearDown(self):
-        self.worker.stop()
+        self.worker.quit()
 
     def test_worker_init(self):
         pass

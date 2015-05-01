@@ -1,6 +1,6 @@
 import time
 import unittest
-from job_manager.broker import Broker, StoppableThread
+from job_manager.broker import Broker
 from task_manager.worker import Worker
 
 
@@ -15,7 +15,7 @@ class MyTestCase(unittest.TestCase):
     def tearDown(self):
         for worker in self.workers:
             worker.quit()
-        self.broker.stop()
+        self.broker.quit()
 
     def test_message_queue(self):
         # add the worker
