@@ -2,7 +2,7 @@ from job_manager.repository import JobManagerRepository
 from bson import ObjectId
 import mock
 import unittest
-
+import networkx as nx
 
 class TestRepository(unittest.TestCase):
 
@@ -10,12 +10,14 @@ class TestRepository(unittest.TestCase):
     def test_insert_job(self, mc):
         # Arrange
         repository = JobManagerRepository()
+        job_name = "new job"
+        task_graph = nx.Graph()
 
         # Act
-        repository.insert_job("new job")
+        repository.insert_job(job_name, task_graph)
 
         # Assert
-        repository.jobs.insert.assert_called_with({'name': "new job"})
+        repository.jobs.insert.assert_called_with({'name': job_name, 'graph': task_graph})
 
     @mock.patch('job_manager.repository.MongoClient')
     def test_get_all_jobs(self, mc):
