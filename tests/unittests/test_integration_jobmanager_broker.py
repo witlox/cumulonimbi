@@ -14,7 +14,7 @@ class MyTestCase(unittest.TestCase):
 
     def tearDown(self):
         for worker in self.workers:
-            worker.stop()
+            worker.quit()
         self.broker.stop()
 
     def test_message_queue(self):

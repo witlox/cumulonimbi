@@ -6,30 +6,14 @@ import zmq
 import logging
 from settings import Settings
 
-
-class StoppableThread(Thread):
-    """
-    Thread class with a stop() method. The thread itself has to check regularly for the stopped() condition.
-    """
-
-    def __init__(self):
-        super(StoppableThread, self).__init__()
-        self._stop = threading.Event()
-
-    def stop(self):
-        self._stop.set()
-
-    def stopped(self):
-        return self._stop.isSet()
-
-
-class Worker(StoppableThread):
+class Worker(Thread):
     """
     Task manager worker, get work from the job manager broker, and execute it.
     """
 
     def __init__(self):
-        StoppableThread.__init__(self)
+        Thread.__init__(self)
+        self._quit = threading.Event()
         self.daemon = True
 
         self.settings = Settings()
@@ -55,6 +39,9 @@ class Worker(StoppableThread):
         worker.send_string(self.ppp_settings.PPP_READY)
         return worker
 
+    def quit(self):
+        self._quit.set()
+
     def run(self):
         liveliness = self.ppp_settings.HEARTBEAT_LIVELINESS
         interval = self.ppp_settings.INTERVAL_INIT
@@ -63,7 +50,7 @@ class Worker(StoppableThread):
 
         worker = self.worker_socket(self.settings, self.context, self.poller)
 
-        while not self.stopped():
+        while not self._quit.is_set():
             socks = dict(self.poller.poll(self.ppp_settings.HEARTBEAT_INTERVAL * 1000))
             # Handle worker activity on backend
             if socks.get(worker) == zmq.POLLIN:

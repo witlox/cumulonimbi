@@ -49,30 +49,15 @@ class WorkerQueue(object):
 
 
 
-class StoppableThread(Thread):
-    """
-    Thread class with a stop() method. The thread itself has to check regularly for the stopped() condition.
-    """
-
-    def __init__(self):
-        super(StoppableThread, self).__init__()
-        self._stop = threading.Event()
-
-    def stop(self):
-        self._stop.set()
-
-    def stopped(self):
-        return self._stop.isSet()
-
-
-class Broker(StoppableThread):
+class Broker(Thread):
 
     """
     Put tasks on the queue for use by a worker, this implements half of the Paranoid Pirate pattern
     """
 
     def __init__(self):
-        StoppableThread.__init__(self)
+        Thread.__init__(self)
+        self._quit = threading.Event()
         self.daemon = True
         # load settings
         settings = Settings()
@@ -88,6 +73,9 @@ class Broker(StoppableThread):
     def put_on_queue(self, work):
         self.queue.put(work)
 
+    def quit(self):
+        self._quit.set()
+
     def run(self):
         # zmq queue mechanism for the dealer
         poll_workers = zmq.Poller()
@@ -95,7 +83,7 @@ class Broker(StoppableThread):
         workers = WorkerQueue()
         heartbeat_at = time.time() + self.ppp_settings.HEARTBEAT_INTERVAL
         # dislike of unstoppable threads
-        while not self.stopped():
+        while not self._quit.is_set():
             # check for active workers
             socks = dict(poll_workers.poll(self.ppp_settings.HEARTBEAT_INTERVAL * 1000))
             # Handle worker activity on backend
