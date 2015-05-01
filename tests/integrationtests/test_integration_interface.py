@@ -1,5 +1,3 @@
-__author__ = 'Johannes'
-
 import unittest
 import requests
 import networkx as nx
@@ -19,7 +17,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(len(jobs) == 0)
 
     def test_add_job(self):
-        data = {'jobname': 'api_job'}
+        data = {'jobname': 'api_job', 'task_graph': nx.Graph()}
         r = requests.post(self.jobs_url, data)
         job = r.json()
 
@@ -33,7 +31,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(r.status_code == 500)
 
     def test_update_job_success(self):
-        data = {'jobname': 'api_job'}
+        data = {'jobname': 'api_job', 'task_graph': nx.Graph()}
         r = requests.post(self.jobs_url, data)
         job = r.json()
 
@@ -41,7 +39,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(r.status_code == 200)
 
     def test_get_specific_job(self):
-        data = {'jobname': 'api_job'}
+        data = {'jobname': 'api_job', 'task_graph': nx.Graph()}
         r = requests.post(self.jobs_url, data)
         job = r.json()
 

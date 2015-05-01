@@ -1,8 +1,5 @@
 import logging
 from pymongo.errors import ConnectionFailure
-
-__author__ = 'Johannes'
-
 from pymongo import MongoClient
 from bson import ObjectId
 

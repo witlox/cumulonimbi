@@ -48,8 +48,8 @@ class Worker(StoppableThread):
         Helper function that returns a new configured socket connected to the Paranoid Pirate queue
         """
         worker = context.socket(zmq.DEALER)
-        identity = '%04X-%04X' % (randint(0, 0x10000), randint(0, 0x10000))
-        worker.setsockopt(zmq.IDENTITY, identity)
+        identity = u'%04X-%04X' % (randint(0, 0x10000), randint(0, 0x10000))
+        worker.setsockopt_string(zmq.IDENTITY, identity)
         poller.register(worker, zmq.POLLIN)
         worker.connect('tcp://%s:%d' % (settings.job_manager_api, settings.job_manager_router_port))
         worker.send(self.ppp_settings.PPP_READY)

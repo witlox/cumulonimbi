@@ -41,8 +41,12 @@ class WorkerQueue(object):
             self.queue.pop(address, None)
 
     def next(self):
+        if len(self.queue.items()) == 0:
+            return None
+
         address, worker = self.queue.popitem(False)
         return address
+
 
 
 class StoppableThread(Thread):
@@ -116,11 +120,12 @@ class Broker(StoppableThread):
             # send the work to the queue
             while not self.queue.empty():
                 qi = self.queue.get()
-                if isinstance(qi, str):
-                    frames = [workers.next(), qi.encode()]
+                next_worker = workers.next()
+                if isinstance(qi, str) and next_worker:
+                    frames = [next_worker, qi.encode()]
                     self.dealer.send_multipart(frames)
                 else:
-                    frames = [workers.next(), qi]
+                    frames = [next_worker, qi]
                     self.dealer.send_multipart(frames)
         workers.purge()
         # out of loop, cleanup connections
