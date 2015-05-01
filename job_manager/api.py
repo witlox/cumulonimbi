@@ -39,8 +39,9 @@ def delete_jobs():
 @api.route('/jobs', methods=['POST'])
 def create_job():
     job_name = request.form['jobname']
+    task_graph = request.form['task_graph']
     repository = api.config['REPOSITORY']
-    response = {'job_id': repository.insert_job(job_name)}
+    response = {'job_id': repository.insert_job(job_name, task_graph)}
     if api.broker:
         api.broker.put_on_queue(job_name)
     return Response(dumps(response), mimetype='application/json')

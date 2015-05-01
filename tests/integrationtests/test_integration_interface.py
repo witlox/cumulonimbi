@@ -2,58 +2,70 @@ __author__ = 'Johannes'
 
 import unittest
 import requests
+import networkx as nx
 
 
 class InterfaceIntegrationTests(unittest.TestCase):
-    def test_get_jobs(self):
-        jobs_url = "http://127.0.0.1:5000/jobs"
-        requests.delete(jobs_url)
 
-        r = requests.get(jobs_url)
+    jobs_url = "http://127.0.0.1:5000/jobs"
+
+    def setUp(self):
+        requests.delete(self.jobs_url)
+
+    def test_get_jobs(self):
+        r = requests.get(self.jobs_url)
         jobs = r.json()
 
         assert(len(jobs) == 0)
 
     def test_add_job(self):
-        jobs_url = "http://127.0.0.1:5000/jobs"
-        requests.delete(jobs_url)
-
         data = {'jobname': 'api_job'}
-        r = requests.post(jobs_url, data)
+        r = requests.post(self.jobs_url, data)
         job = r.json()
 
-        r = requests.get(jobs_url)
+        r = requests.get(self.jobs_url)
         jobs = r.json()
 
         assert(len(jobs) == 1)
 
     def test_update_job_failed(self):
-        jobs_url = "http://127.0.0.1:5000/jobs"
-        requests.delete(jobs_url)
-
-        r = requests.put(jobs_url + '/123')
+        r = requests.put(self.jobs_url + '/123')
         assert(r.status_code == 500)
 
     def test_update_job_success(self):
-        jobs_url = "http://127.0.0.1:5000/jobs"
-        requests.delete(jobs_url)
-
         data = {'jobname': 'api_job'}
-        r = requests.post(jobs_url, data)
+        r = requests.post(self.jobs_url, data)
         job = r.json()
 
-        r = requests.put(jobs_url + '/' + job['job_id'])
+        r = requests.put(self.jobs_url + '/' + job['job_id'])
         assert(r.status_code == 200)
 
     def test_get_specific_job(self):
-        jobs_url = "http://127.0.0.1:5000/jobs"
-        requests.delete(jobs_url)
-
         data = {'jobname': 'api_job'}
-        r = requests.post(jobs_url, data)
+        r = requests.post(self.jobs_url, data)
         job = r.json()
 
-        r = requests.get(jobs_url + '/' + job['job_id'])
+        r = requests.get(self.jobs_url + '/' + job['job_id'])
         job = r.json()
 
         assert(job['name'] == data['jobname'])
+
+    def test_get_all_tasks(self):
+        g = nx.Graph()
+        t1 = "hello"
+        t2 = "world"
+        t3 = "!"
+        g.add_edge(t1, t2)
+        g.add_edge(t2, t3)
+
+        data = {'jobname': 'api_job', 'task_graph': g}
+        r = requests.post(self.jobs_url, data)
+        assert(r.status_code == 200)
+
+        # get all jobs
+        r = requests.get(self.jobs_url)
+        jobs = r.json()
+        tasks = []
+        for job in jobs:
+            tasks.append(nx.dfs_edges(job['task_graph']))
+        assert(len(tasks) == 3)

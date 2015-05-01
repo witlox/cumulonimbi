@@ -7,6 +7,7 @@ import mock
 from bson import ObjectId
 from job_manager.repository import JobManagerRepository
 from job_manager.api import api
+import networkx as nx
 
 
 class TestRepository(unittest.TestCase):
@@ -23,14 +24,15 @@ class TestRepository(unittest.TestCase):
 
         self.app = api.test_client()
         job_name = "new job"
+        task_graph = nx.Graph()
 
         # Act
-        rv = self.app.post('/jobs', data=dict(jobname=job_name))
+        rv = self.app.post('/jobs', data=dict(jobname=job_name, task_graph=task_graph))
 
         # Assert
         body = rv.data.decode(rv.charset)
         self.assertEqual({'job_id': job_id}, json.loads(body))
-        self.repository.jobs.insert.assert_called_with({'name': "new job"})
+        self.repository.jobs.insert.assert_called_with({'name': "new job", 'graph': ''})
 
     def test_get_jobs(self):
         # Arrange
