@@ -14,19 +14,12 @@ from threading import Thread
 from settings import Settings
 
 
-#  check intervals
-HEARTBEAT_LIVELINESS = 3   # 3..5 is reasonable
-HEARTBEAT_INTERVAL = 1.0   # Seconds
-
-#  Paranoid Pirate Protocol constants
-PPP_READY = '\x01'.encode()      # Signals worker is ready
-PPP_HEARTBEAT = '\x02'.encode()  # Signals worker heartbeat
-
-
 class Worker(object):
+
     def __init__(self, address):
+        ppp_settings = Settings.ParanoidPirateProtocolSetting()
         self.address = address
-        self.expiry = time.time() + HEARTBEAT_INTERVAL * HEARTBEAT_LIVELINESS
+        self.expiry = time.time() + ppp_settings.HEARTBEAT_INTERVAL * ppp_settings.HEARTBEAT_LIVELINESS
 
 
 class WorkerQueue(object):
@@ -41,7 +34,7 @@ class WorkerQueue(object):
         """Look for & kill expired workers."""
         t = time.time()
         expired = []
-        for address,worker in self.queue.items():
+        for address, worker in self.queue.items():
             if t > worker.expiry:  # Worker expired
                 expired.append(address)
         for address in expired:
@@ -79,6 +72,7 @@ class Broker(StoppableThread):
         self.daemon = True
         # load settings
         settings = Settings()
+        self.ppp_settings = Settings.ParanoidPirateProtocolSetting()
         # prepare synchronized queue
         self.queue = Queue()
         # prepare context
@@ -95,11 +89,11 @@ class Broker(StoppableThread):
         poll_workers = zmq.Poller()
         poll_workers.register(self.dealer, zmq.POLLIN)
         workers = WorkerQueue()
-        heartbeat_at = time.time() + HEARTBEAT_INTERVAL
+        heartbeat_at = time.time() + self.ppp_settings.HEARTBEAT_INTERVAL
         # dislike of unstoppable threads
         while not self.stopped():
             # check for active workers
-            socks = dict(poll_workers.poll(HEARTBEAT_INTERVAL * 1000))
+            socks = dict(poll_workers.poll(self.ppp_settings.HEARTBEAT_INTERVAL * 1000))
             # Handle worker activity on backend
             if socks.get(self.dealer) == zmq.POLLIN:
                 # Use worker address for LRU routing
@@ -111,14 +105,14 @@ class Broker(StoppableThread):
                 # Validate control message, or return reply to client
                 msg = frames[1:]
                 if len(msg) == 1:
-                    if msg[0] not in (PPP_READY, PPP_HEARTBEAT):
+                    if msg[0] not in (self.ppp_settings.PPP_READY, self.ppp_settings.PPP_HEARTBEAT):
                         logging.error('Invalid message from worker: %s' % msg)
                 # Send heartbeats to idle workers if it's time
                 if time.time() >= heartbeat_at:
                     for worker in workers.queue:
-                        msg = [worker, PPP_HEARTBEAT]
+                        msg = [worker, self.ppp_settings.PPP_HEARTBEAT]
                         self.dealer.send_multipart(msg)
-                    heartbeat_at = time.time() + HEARTBEAT_INTERVAL
+                    heartbeat_at = time.time() + self.ppp_settings.HEARTBEAT_INTERVAL
             # send the work to the queue
             while not self.queue.empty():
                 qi = self.queue.get()

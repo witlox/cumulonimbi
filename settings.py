@@ -7,10 +7,26 @@ class Settings(object):
     This class contains all settings for the cumulonimbi project
     """
 
+    class ParanoidPirateProtocolSetting(object):
+        """
+        These are the socket timing settings and protocol specs for the Paranoid Pirate Protocol (PPP) implementation
+        Change these at your own risk :)
+        """
+
+        HEARTBEAT_LIVELINESS = 3
+        HEARTBEAT_INTERVAL = 1
+        INTERVAL_INIT = 1
+        INTERVAL_MAX = 32
+
+        # Paranoid Pirate Protocol constants
+        PPP_READY = '\x01'  # Signals worker is ready
+        PPP_HEARTBEAT = '\x02'  # Signals worker heartbeat
+
+
     debug = False  # sets all debug options to on (also for internal debuggers of external libraries)
     project_root = os.path.abspath(os.path.dirname(__file__))
 
-    job_manager_api = "127.0.0.0"
+    job_manager_api = '127.0.0.1'
     job_manager_mongo_client_host = '127.0.0.1'
     job_manager_mongo_client_port = 27017
     job_manager_router_port = 5559

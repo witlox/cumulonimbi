@@ -84,7 +84,7 @@ class Cumulonimbi:
         jmapi.start()
 
     def start_task_manager(self):
-        tmworker.
+        pass
 
 if __name__ == "__main__":
     Cumulonimbi().run()
