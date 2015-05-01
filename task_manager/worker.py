@@ -68,7 +68,7 @@ class Worker(Thread):
                     logging.debug('Queue heartbeat')
                     liveliness = self.ppp_settings.HEARTBEAT_LIVELINESS
                 else:
-                    logging.info('received message: %s' % frames)
+                    logging.info('received message: %s' % frames[0].decode())
                     self.message = frames[0]
                     self.working = True  # magic process
                 interval = self.ppp_settings.INTERVAL_INIT

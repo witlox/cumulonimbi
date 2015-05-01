@@ -27,7 +27,7 @@ class MyTestCase(unittest.TestCase):
         # wait for the worker to process the message
         while not worker.working:
             time.sleep(.1)
-        self.assertEqual('Hello', worker.message)
+        self.assertEqual('Hello', worker.message.decode())
 
 
 if __name__ == '__main__':
