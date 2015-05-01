@@ -24,10 +24,10 @@ class TestRepository(unittest.TestCase):
 
         self.app = api.test_client()
         job_name = "new job"
-        task_graph = nx.Graph()
+        graph = nx.Graph()
 
         # Act
-        rv = self.app.post('/jobs', data=dict(jobname=job_name, task_graph=task_graph))
+        rv = self.app.post('/jobs', data=dict(jobname=job_name, graph=graph))
 
         # Assert
         body = rv.data.decode(rv.charset)

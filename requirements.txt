@@ -1,6 +1,9 @@
 pymongo
 networkx
 mock
+Werkzeug
+Jinja2
+itsdangerous
 flask
 requests
 nose

@@ -23,8 +23,8 @@ class JobManagerRepository():
             all_jobs.append(job)
         return all_jobs
 
-    def insert_job(self, job_name, task_graph):
-        job_id = str(self.jobs.insert({'name': job_name, 'graph': task_graph}))
+    def insert_job(self, job_name, graph):
+        job_id = str(self.jobs.insert({'name': job_name, 'graph': graph}))
         return job_id
 
     def update_job(self, job_id, status):

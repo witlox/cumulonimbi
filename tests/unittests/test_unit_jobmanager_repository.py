@@ -11,13 +11,13 @@ class TestRepository(unittest.TestCase):
         # Arrange
         repository = JobManagerRepository()
         job_name = "new job"
-        task_graph = nx.Graph()
+        graph = nx.Graph()
 
         # Act
-        repository.insert_job(job_name, task_graph)
+        repository.insert_job(job_name, graph)
 
         # Assert
-        repository.jobs.insert.assert_called_with({'name': job_name, 'graph': task_graph})
+        repository.jobs.insert.assert_called_with({'name': job_name, 'graph': graph})
 
     @mock.patch('job_manager.repository.MongoClient')
     def test_get_all_jobs(self, mc):

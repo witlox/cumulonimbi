@@ -1,7 +1,9 @@
+import json
 import unittest
 import requests
 import networkx as nx
 from networkx.readwrite import json_graph
+import flask
 
 class InterfaceIntegrationTests(unittest.TestCase):
 
@@ -17,7 +19,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(len(jobs) == 0)
 
     def test_add_job(self):
-        data = {'jobname': 'api_job', 'task_graph': json_graph.node_link_data(nx.Graph())}
+        data = {'jobname': 'api_job', 'graph': json_graph.node_link_data(nx.Graph())}
         r = requests.post(self.jobs_url, data)
         job = r.json()
 
@@ -31,7 +33,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(r.status_code == 500)
 
     def test_update_job_success(self):
-        data = {'jobname': 'api_job', 'task_graph': json_graph.node_link_data(nx.Graph())}
+        data = {'jobname': 'api_job', 'graph': json_graph.node_link_data(nx.Graph())}
         r = requests.post(self.jobs_url, data)
         job = r.json()
 
@@ -39,7 +41,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(r.status_code == 200)
 
     def test_get_specific_job(self):
-        data = {'jobname': 'api_job', 'task_graph': json_graph.node_link_data(nx.Graph())}
+        data = {'jobname': 'api_job', 'graph': json_graph.node_link_data(nx.Graph())}
         r = requests.post(self.jobs_url, data)
         job = r.json()
 
@@ -56,7 +58,7 @@ class InterfaceIntegrationTests(unittest.TestCase):
         g.add_edge(t1, t2)
         g.add_edge(t2, t3)
 
-        data = {'jobname': 'api_job', 'task_graph': json_graph.node_link_data(g)}
+        data = {'jobname': 'api_job', 'graph': json_graph.node_link_data(g)}
         r = requests.post(self.jobs_url, data)
         assert(r.status_code == 200)
 
@@ -65,5 +67,5 @@ class InterfaceIntegrationTests(unittest.TestCase):
         jobs = r.json()
         tasks = []
         for job in jobs:
-            tasks.append(nx.dfs_edges(job['task_graph']))
+            tasks.append(nx.dfs_edges(job['graph']))
         assert(len(tasks) == 3)

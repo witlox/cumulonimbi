@@ -82,5 +82,5 @@ Vagrant.configure(2) do |config|
   # documentation for more information about their specific syntax and use.
 
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
-  config.vm.provision "integration", type: "shell", path: "startup.sh", run: "always"
+  config.vm.provision "integration", type: "shell", path: "startup.sh", args: ENV['SHELL_ARGS'], run: "always"
 end
