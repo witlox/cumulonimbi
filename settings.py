@@ -19,8 +19,8 @@ class Settings(object):
         INTERVAL_MAX = 32
 
         # Paranoid Pirate Protocol constants
-        PPP_READY = '\x01'  # Signals worker is ready
-        PPP_HEARTBEAT = '\x02'  # Signals worker heartbeat
+        PPP_READY = '\x01'.encode()  # Signals worker is ready
+        PPP_HEARTBEAT = '\x02'.encode()  # Signals worker heartbeat
 
 
     debug = False  # sets all debug options to on (also for internal debuggers of external libraries)

@@ -98,7 +98,7 @@ class Broker(Thread):
                 msg = frames[1:]
                 if len(msg) == 1:
                     if msg[0] not in (self.ppp_settings.PPP_READY, self.ppp_settings.PPP_HEARTBEAT):
-                        logging.error('Invalid message from worker: %s' % msg.decode())
+                        logging.error('Invalid message from worker: %s' % msg[0].decode())
                 # Send heartbeats to idle workers if it's time
                 if time.time() >= heartbeat_at:
                     for worker in workers.queue:
