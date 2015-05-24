@@ -67,5 +67,6 @@ class InterfaceIntegrationTests(unittest.TestCase):
         jobs = r.json()
         tasks = []
         for job in jobs:
-            tasks.append(nx.dfs_edges(job['graph']))
+            for n in job['graph']['nodes']:
+                tasks.append(n)
         assert(len(tasks) == 3)

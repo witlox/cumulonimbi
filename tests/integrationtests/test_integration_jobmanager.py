@@ -32,8 +32,11 @@ class JobManagerIntegrationTests(unittest.TestCase):
 
         graph = json_graph.node_link_data(nx.Graph())
 
-        id_A = app.post('/jobs', data=dict(jobname="A", graph=graph))
-        id_A = app.post('/jobs', data=dict(jobname="B", graph=graph))
+        data_A = {'job_name': "A", 'graph': graph}
+        id_A = app.post('/jobs', data=json.dumps(data_A))
+
+        data_B = {'job_name': "B", 'graph': graph}
+        id_B = app.post('/jobs', data=json.dumps(data_B))
 
         rv = app.get('/jobs')
         body = rv.data.decode(rv.charset)
