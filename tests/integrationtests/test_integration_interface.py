@@ -19,8 +19,8 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(len(jobs) == 0)
 
     def test_add_job(self):
-        data = {'jobname': 'api_job', 'graph': json_graph.node_link_data(nx.Graph())}
-        r = requests.post(self.jobs_url, data)
+        data = {'job_name': 'api_job', 'graph': json_graph.node_link_data(nx.Graph())}
+        r = requests.post(self.jobs_url, data=json.dumps(data))
         job = r.json()
 
         r = requests.get(self.jobs_url)
@@ -33,22 +33,22 @@ class InterfaceIntegrationTests(unittest.TestCase):
         assert(r.status_code == 500)
 
     def test_update_job_success(self):
-        data = {'jobname': 'api_job', 'graph': json_graph.node_link_data(nx.Graph())}
-        r = requests.post(self.jobs_url, data)
+        data = {'job_name': 'api_job', 'graph': json_graph.node_link_data(nx.Graph())}
+        r = requests.post(self.jobs_url, data=json.dumps(data))
         job = r.json()
 
         r = requests.put(self.jobs_url + '/' + job['job_id'])
         assert(r.status_code == 200)
 
     def test_get_specific_job(self):
-        data = {'jobname': 'api_job', 'graph': json_graph.node_link_data(nx.Graph())}
-        r = requests.post(self.jobs_url, data)
+        data = {'job_name': 'api_job', 'graph': json_graph.node_link_data(nx.Graph())}
+        r = requests.post(self.jobs_url, data=json.dumps(data))
         job = r.json()
 
         r = requests.get(self.jobs_url + '/' + job['job_id'])
         job = r.json()
 
-        assert(job['name'] == data['jobname'])
+        assert(job['name'] == data['job_name'])
 
     def test_get_all_tasks(self):
         g = nx.Graph()
@@ -58,8 +58,8 @@ class InterfaceIntegrationTests(unittest.TestCase):
         g.add_edge(t1, t2)
         g.add_edge(t2, t3)
 
-        data = {'jobname': 'api_job', 'graph': json_graph.node_link_data(g)}
-        r = requests.post(self.jobs_url, data)
+        data = {'job_name': 'api_job', 'graph': json_graph.node_link_data(g)}
+        r = requests.post(self.jobs_url, data=json.dumps(data))
         assert(r.status_code == 200)
 
         # get all jobs
