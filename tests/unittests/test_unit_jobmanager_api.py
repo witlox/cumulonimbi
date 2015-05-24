@@ -8,6 +8,7 @@ from bson import ObjectId
 from job_manager.repository import JobManagerRepository
 from job_manager.api import api
 import networkx as nx
+from networkx.readwrite import json_graph
 
 
 class TestRepository(unittest.TestCase):
@@ -24,15 +25,16 @@ class TestRepository(unittest.TestCase):
 
         self.app = api.test_client()
         job_name = "new job"
-        graph = nx.Graph()
+        g = nx.Graph()
 
         # Act
-        rv = self.app.post('/jobs', data=dict(jobname=job_name, graph=graph))
+        data = {'job_name': job_name, 'graph': json_graph.node_link_data(g)}
+        rv = self.app.post('/jobs', data=json.dumps(data))
 
         # Assert
         body = rv.data.decode(rv.charset)
         self.assertEqual({'job_id': job_id}, json.loads(body))
-        self.repository.jobs.insert.assert_called_with({'name': "new job", 'graph': ''})
+        self.repository.jobs.insert.assert_called_with({'name': job_name, 'graph': json_graph.node_link_data(g)})
 
     def test_get_jobs(self):
         # Arrange
