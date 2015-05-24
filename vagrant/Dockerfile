@@ -14,8 +14,7 @@ CMD ["/sbin/my_init"]
 RUN apt-get update && apt-get install -y \
   git \
   python-dev \
-  python-pip \
-  libzmq-dev
+  python-pip
 
 # Get the repository and install reqs
 RUN git clone https://github.com/witlox/cumulonimbi.git && pip install -r cumulonimbi/requirements.txt
