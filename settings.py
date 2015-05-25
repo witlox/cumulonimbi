@@ -26,7 +26,6 @@ class Settings(object):
     project_root = os.path.abspath(os.path.dirname(__file__))
 
     job_manager_api = 'localhost'.encode()
-    job_manager_api_debug = False
     job_manager_mongo_client_host = '127.0.0.1'.encode()
     job_manager_mongo_client_port = 27017
     job_manager_router_port = 5559

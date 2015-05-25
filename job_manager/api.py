@@ -92,13 +92,9 @@ def start():
     # start non-blocking broker with queue
     api.broker = Broker()
     api.broker.start()
-    api.config.update(
-        SERVER_NAME=settings.job_manager_api,
-        DEBUG=settings.job_manager_api_debug
-    )
 
     # start flask
-    api.run()
+    api.run(host=settings.job_manager_api, debug=settings.debug)
 
     # cleanup
     api.broker.stop()
