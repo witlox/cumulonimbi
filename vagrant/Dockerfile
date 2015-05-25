@@ -22,12 +22,12 @@ RUN apt-get update && apt-get install -y \
   automake
 
 # Download, build and install ZMQ
-RUN wget http://download.zeromq.org/zeromq-4.1.0-rc1.tar.gz &&
-    tar xvzf zeromq-4.1.0-rc1.tar.gz &&
-    ./configure &&
-    make &&
-    sudo make install &&
-    sudo ldconfig
+RUN wget http://download.zeromq.org/zeromq-4.1.0-rc1.tar.gz
+RUN tar xvzf ./zeromq-4.1.0-rc1.tar.gz
+RUN ./configure
+RUN make
+RUN sudo make install
+RUN sudo ldconfig
 
 # Get the repository and install reqs
 RUN git clone https://github.com/witlox/cumulonimbi.git && pip install -r cumulonimbi/requirements.txt
