@@ -8,4 +8,3 @@ flask
 requests
 nose
 python-logstash
-pyzmq
