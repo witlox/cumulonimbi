@@ -8,4 +8,4 @@ flask
 requests
 nose
 python-logstash
-pyzmq
+pyzmq --zmq=bundled

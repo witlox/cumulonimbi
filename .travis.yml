@@ -2,6 +2,7 @@
 language: python
 # supported language versions
 python:
+  - "2.6"
   - "2.7"
   - "pypy"
 # dependency install
