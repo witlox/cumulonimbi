@@ -58,20 +58,23 @@ class MyTestCase(unittest.TestCase):
         worker = Worker()
         worker.start()
         self.workers.append(worker)
+
         # send a message to the worker
         self.broker.put_on_queue('Hello1')
         self.broker.put_on_queue('Hello2')
         self.broker.put_on_queue('Hello3')
         self.broker.put_on_queue('Hello4')
         self.broker.put_on_queue('Hello5')
+
         # wait for the worker to process the message
         while not len(worker.finished) == 5:
             time.sleep(.1)
-        self.assertEqual('Hello1', worker.finished[0].decode())
-        self.assertEqual('Hello2', worker.finished[1].decode())
-        self.assertEqual('Hello3', worker.finished[2].decode())
-        self.assertEqual('Hello4', worker.finished[3].decode())
-        self.assertEqual('Hello5', worker.finished[4].decode())
+
+        self.assertTrue('Hello1' in worker.finished)
+        self.assertTrue('Hello2' in worker.finished)
+        self.assertTrue('Hello3' in worker.finished)
+        self.assertTrue('Hello4' in worker.finished)
+        self.assertTrue('Hello5' in worker.finished)
 
     def test_5_messages_2_workers(self):
         # add the workers

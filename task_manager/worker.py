@@ -19,7 +19,7 @@ class Worker(Thread):
         self.daemon = True
 
         self.settings = Settings()
-        self.settings.configure_logging('../logs/task_manager.log')
+        self.settings.configure_logging('../logs/task_manager.log', 'TaskManagerWorker')
 
         self.ppp_settings = self.settings.ParanoidPirateProtocolSetting()
 
@@ -73,7 +73,7 @@ class Worker(Thread):
                     logging.debug('Queue heartbeat')
                     liveliness = self.ppp_settings.HEARTBEAT_LIVELINESS
                 else:  # Message to execute
-                    logging.debug('received message: %s' % frames[0].decode())
+                    logging.info('received message: %s' % frames[0].decode())
                     self.unfinished.append(frames[0])
                     liveliness = self.ppp_settings.HEARTBEAT_LIVELINESS
                 interval = self.ppp_settings.INTERVAL_INIT

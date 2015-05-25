@@ -36,3 +36,12 @@ if [ "$1" != "local-only" ]; then
     echo "Running integration tests"
     docker run -i --rm --net=host --name="integrationtests" witlox/cumulonimbi nosetests cumulonimbi/tests/integrationtests
 fi
+
+if [ "$1" = "local-only" ]; then
+    echo "Waiting for logstash to start."
+    until $(curl --output /dev/null --silent --head --fail http://localhost:9200); do
+        printf '.'
+        sleep 10
+    done
+    echo "It's up!"
+fi

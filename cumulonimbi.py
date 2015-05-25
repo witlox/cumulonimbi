@@ -3,7 +3,7 @@ import logging
 from os import path
 from settings import Settings
 import job_manager.api as jmapi
-import task_manager.worker as tmworker
+from task_manager.worker import Worker
 
 
 """ This is the starting class for all Cumulonimbi. """
@@ -16,7 +16,7 @@ class Cumulonimbi:
     def __init__(self):
         settings = Settings()
         logfile = path.dirname(path.abspath(__file__)) + '/logs/job_manager.log'
-        settings.configure_logging(logfile)
+        settings.configure_logging(logfile, 'Cumulonimbi')
 
     def run(self):
         # Parse command line arguments.
@@ -79,12 +79,8 @@ class Cumulonimbi:
             if "err" in str(level).lower():
                 root_logger.setLevel(logging.ERROR)
 
-
     def start_job_manager(self):
         jmapi.start()
-
-    def start_task_manager(self):
-        pass
 
 if __name__ == "__main__":
     Cumulonimbi().run()

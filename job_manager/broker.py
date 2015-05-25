@@ -40,6 +40,9 @@ class WorkerQueue(object):
         for address in expired:
             self.queue.pop(address, None)
 
+    def size(self):
+        return len(self.queue.items())
+
     def next(self):
         if len(self.queue.items()) == 0:
             return None
@@ -105,16 +108,18 @@ class Broker(Thread):
                         msg = [worker, self.ppp_settings.PPP_HEARTBEAT]
                         self.dealer.send_multipart(msg)
                     heartbeat_at = time.time() + self.ppp_settings.HEARTBEAT_INTERVAL
+
+            if self.queue.qsize() > 0 and workers.size() == 0:
+                logging.info('amount of unfinished tasks: {0}, amount of workers: {1}'.format(self.queue.qsize(), workers.size()))
+                time.sleep(1)
+
             # send the work to the queue
             next_worker = workers.next()
             if next_worker and not self.queue.empty():
                 qi = self.queue.get()
-                if isinstance(qi, str):
-                    frames = [next_worker, qi.encode()]
-                    self.dealer.send_multipart(frames)
-                else:
-                    frames = [next_worker, qi]
-                    self.dealer.send_multipart(frames)
+                frames = [next_worker, qi.encode()]
+                self.dealer.send_multipart(frames)
+
         workers.purge()
         # out of loop, cleanup connections
         self.dealer.close()

@@ -40,7 +40,7 @@ class Settings(object):
 
     repository = None
 
-    def configure_logging(self, file_path):
+    def configure_logging(self, file_path, module_name):
         """
         Configure logging per instance, set the file path for the rotating file logger
         """
@@ -53,8 +53,9 @@ class Settings(object):
             'version': 1,
             'disable_existing_loggers': False,
             'formatters': {
-                'standard': {'format': '%(asctime)s[%(levelname)s](%(name)s):%(message)s',
-                             'datefmt': '%Y-%m-%d %H:%M:%S'}
+                'standard': {'format': '['+module_name+']-%(asctime)s[%(levelname)s](%(name)s):%(message)s',
+                             'datefmt': '%Y-%m-%d %H:%M:%S'},
+                'logstash': {'format': '['+module_name+']-[%(levelname)s] %(message)s'}
             },
             'handlers': {
                 'fh': {'class': 'logging.handlers.RotatingFileHandler',
@@ -65,7 +66,7 @@ class Settings(object):
                        'maxBytes': self.log_file_size,
                        'backupCount': self.log_file_rotate},
                 'ls': {'class': 'logstash.TCPLogstashHandler',
-                       'formatter': 'standard',
+                       'formatter': 'logstash',
                        'level': self.log_stash_level,
                        'host': self.log_stash_host,
                        'port': self.log_stash_port,
@@ -78,5 +79,6 @@ class Settings(object):
             }
         }
         dictConfig(logging_config)
+
         # always send an initial debug message so we can see if the logger is working as desired
-        logging.debug('logging configured')
+        logging.info('logging configured')

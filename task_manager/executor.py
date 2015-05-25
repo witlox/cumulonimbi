@@ -16,7 +16,7 @@ class Executor(Thread):
         self.daemon = True
         # load settings
         self.settings = Settings()
-        self.settings.configure_logging('../logs/task_manager.log')
+        self.settings.configure_logging('../logs/task_manager.log', 'TaskManagerExecutor')
         self.unfinished = unfinished
         self.finished = finished
 
@@ -25,12 +25,12 @@ class Executor(Thread):
 
     def do_work(self):
         workload = self.unfinished.pop()
-        logging.debug('executing workload: %s' % workload)
+        logging.info('executing workload: %s' % workload)
         time.sleep(.1)
         self.finished.append(workload)
 
     def run(self):
-        logging.debug('starting task executor')
+        logging.info('starting task executor')
 
         # dislike of unstoppable threads
         while not self._quit.is_set():
@@ -40,4 +40,4 @@ class Executor(Thread):
             else:
                 time.sleep(.1)
 
-        logging.debug('stopping task executor')
+        logging.info('stopping task executor')

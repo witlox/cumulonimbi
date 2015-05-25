@@ -82,7 +82,7 @@ def start():
     """
     settings = Settings()
     logfile = path.dirname(path.dirname(path.abspath(__file__))) + '/logs/job_manager.log'
-    settings.configure_logging(logfile)
+    settings.configure_logging(logfile, 'JobManagerApi')
 
     # configure storage
     api.config['REPOSITORY'] = settings.repository
