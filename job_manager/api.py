@@ -11,7 +11,6 @@ from job_manager.broker import Broker
 from job_manager.repository import JobManagerRepository
 from settings import Settings
 
-
 """
 This is the main api for the job manager, entry point to Cumulonimbi
 """
@@ -21,6 +20,7 @@ api = Flask(__name__, instance_relative_config=True)
 Create placeholder for broker with message queue
 """
 api.broker = None
+
 
 @api.route('/jobs', methods=['GET'])
 def get_jobs():
@@ -61,7 +61,6 @@ def edit_job(job_id):
     return response
 
 
-
 @api.route('/jobs/<job_id>', methods=['GET'])
 def get_job(job_id):
     repository = api.config['REPOSITORY']
@@ -93,9 +92,13 @@ def start():
     # start non-blocking broker with queue
     api.broker = Broker()
     api.broker.start()
+    api.config.update(
+        SERVER_NAME=settings.job_manager_api,
+        DEBUG=settings.job_manager_api_debug
+    )
 
     # start flask
-    api.run(host=settings.job_manager_api, debug=settings.debug)
+    api.run()
 
     # cleanup
     api.broker.stop()
