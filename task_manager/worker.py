@@ -5,6 +5,8 @@ import time
 import zmq
 import logging
 from settings import Settings
+from executor import Executor
+
 
 class Worker(Thread):
     """
@@ -25,7 +27,9 @@ class Worker(Thread):
         self.poller = zmq.Poller()
 
         self.working = False
-        self.message = None
+        self.unfinished = []
+        self.finished = []
+        self.executor = Executor(self.unfinished, self.finished)
 
     def worker_socket(self, settings, context, poller):
         """
@@ -49,8 +53,10 @@ class Worker(Thread):
         heartbeat_at = time.time() + self.ppp_settings.HEARTBEAT_INTERVAL
 
         worker = self.worker_socket(self.settings, self.context, self.poller)
+        self.executor.start()
 
         while not self._quit.is_set():
+
             socks = dict(self.poller.poll(self.ppp_settings.HEARTBEAT_INTERVAL * 1000))
             # Handle worker activity on backend
             if socks.get(worker) == zmq.POLLIN:
@@ -60,17 +66,16 @@ class Worker(Thread):
                 frames = worker.recv_multipart()
                 if not frames:
                     break  # Interrupted
-                if len(frames) == 3:
+                if len(frames) == 3:  # ??
                     worker.send_multipart(frames)
                     liveliness = self.ppp_settings.HEARTBEAT_LIVELINESS
-                    time.sleep(1)  # Do some heavy work
                 elif len(frames) == 1 and frames[0] == self.ppp_settings.PPP_HEARTBEAT:
                     logging.debug('Queue heartbeat')
                     liveliness = self.ppp_settings.HEARTBEAT_LIVELINESS
-                else:
-                    logging.info('received message: %s' % frames[0].decode())
-                    self.message = frames[0]
-                    self.working = True  # magic process
+                else:  # Message to execute
+                    logging.debug('received message: %s' % frames[0].decode())
+                    self.unfinished.append(frames[0])
+                    liveliness = self.ppp_settings.HEARTBEAT_LIVELINESS
                 interval = self.ppp_settings.INTERVAL_INIT
             else:
                 liveliness -= 1
@@ -88,6 +93,10 @@ class Worker(Thread):
                 heartbeat_at = time.time() + self.ppp_settings.HEARTBEAT_INTERVAL
                 logging.debug('Worker heartbeat')
                 worker.send(self.ppp_settings.PPP_HEARTBEAT)
+
+        # stop executor
+        self.executor.quit()
+        self.executor.join()
 
         # cleanup context
         worker.close()

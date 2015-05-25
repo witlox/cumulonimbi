@@ -106,12 +106,9 @@ class Broker(Thread):
                         self.dealer.send_multipart(msg)
                     heartbeat_at = time.time() + self.ppp_settings.HEARTBEAT_INTERVAL
             # send the work to the queue
-            while not self.queue.empty():
+            next_worker = workers.next()
+            if next_worker and not self.queue.empty():
                 qi = self.queue.get()
-                next_worker = workers.next()
-                while not next_worker:
-                    time.sleep(1)
-                    next_worker = workers.next()
                 if isinstance(qi, str):
                     frames = [next_worker, qi.encode()]
                     self.dealer.send_multipart(frames)
