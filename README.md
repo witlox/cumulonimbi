@@ -7,3 +7,5 @@ The following is needed to build and run the tests:
 - Python 2.7 or higher (we recommend Anaconda for windows users)
 - Vagrant
 - VirtualBox
+
+![Task States](documentation/task-states.png)
