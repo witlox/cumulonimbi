@@ -11,6 +11,9 @@ from job_manager.broker import Broker
 from job_manager.repository import JobManagerRepository
 from settings import Settings
 
+from TransitionError import TransitionError
+from StatusUnknownError import StatusUnknownError
+
 """
 This is the main api for the job manager, entry point to Cumulonimbi
 """
@@ -46,13 +49,18 @@ def create_job():
     return Response(dumps(response), mimetype='application/json')
 
 
-@api.route('/jobs/<job_id>', methods=['PUT'])
-def edit_job(job_id):
+@api.route('/jobs/<job_id>/status', methods=['PUT'])
+def set_job_status(job_id):
+    data = request.get_json(force=True)
     repository = api.config['REPOSITORY']
     try:
-        repository.update_job(job_id, 'done')
-    except Exception as e:
-        response = jsonify(message=str(e))
+        repository.update_job_status(job_id, data["status"])
+    except TransitionError as e:
+        response = jsonify(message=str(e.message))
+        response.status_code = 500
+        return response
+    except StatusUnknownError as e:
+        response = jsonify(message=str(e.message))
         response.status_code = 500
         return response
 
@@ -67,6 +75,14 @@ def get_job(job_id):
     response = repository.get_job(job_id)
     return Response(dumps(response), mimetype='application/json')
 
+
+@api.route('/jobs/<job_id>/status', methods=['GET'])
+def get_job_status(job_id):
+    repository = api.config['REPOSITORY']
+    job = repository.get_job(job_id)
+    response = jsonify(status=job["status"])
+    response.status_code = 200
+    return response
 
 @api.route('/jobs/<job_id>', methods=['DELETE'])
 def delete_job(job_id):

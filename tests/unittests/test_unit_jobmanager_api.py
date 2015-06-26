@@ -1,5 +1,3 @@
-__author__ = 'Johannes'
-
 import unittest
 import json
 
@@ -34,7 +32,7 @@ class TestRepository(unittest.TestCase):
         # Assert
         body = rv.data.decode(rv.charset)
         self.assertEqual({'job_id': job_id}, json.loads(body))
-        self.repository.jobs.insert.assert_called_with({'name': job_name, 'graph': json_graph.node_link_data(g)})
+        self.repository.jobs.insert.assert_called_with({'name': job_name, 'graph': json_graph.node_link_data(g), 'status': 'RCVD'})
 
     def test_get_jobs(self):
         # Arrange

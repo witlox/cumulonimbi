@@ -17,7 +17,7 @@ class TestRepository(unittest.TestCase):
         repository.insert_job(job_name, graph)
 
         # Assert
-        repository.jobs.insert.assert_called_with({'name': job_name, 'graph': graph})
+        repository.jobs.insert.assert_called_with({'name': job_name, 'graph': graph, 'status': 'RCVD'})
 
     @mock.patch('job_manager.repository.MongoClient')
     def test_get_all_jobs(self, mc):
