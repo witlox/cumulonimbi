@@ -23,4 +23,11 @@ Vagrant.configure(2) do |config|
     end
   end
 
+  config.vm.define "Redis" do |rds|
+    rds.vm.network "forwarded_port", guest: 6379, host: 6379
+    rds.vm.provider "docker" do |d|
+      d.image = "redis"
+    end
+  end
+
 end

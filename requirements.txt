@@ -1,3 +1,7 @@
+hiredis
+redis
+six
+rom
 pymongo
 networkx
 mock
