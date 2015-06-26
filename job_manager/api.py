@@ -69,20 +69,19 @@ def set_job_status(job_id):
     return response
 
 
+@api.route('/jobs/<job_id>/<param>', methods=['GET'])
 @api.route('/jobs/<job_id>', methods=['GET'])
-def get_job(job_id):
+def get_job(job_id, param=None):
     repository = api.config['REPOSITORY']
-    response = repository.get_job(job_id)
-    return Response(dumps(response), mimetype='application/json')
+    if param in ["status", "graph", "name"]:
+        job = repository.get_job(job_id)
+        response = jsonify({param: job[param]})
+        response.status_code = 200
+        return response
+    else:
+        response = repository.get_job(job_id)
+        return Response(dumps(response), mimetype='application/json')
 
-
-@api.route('/jobs/<job_id>/status', methods=['GET'])
-def get_job_status(job_id):
-    repository = api.config['REPOSITORY']
-    job = repository.get_job(job_id)
-    response = jsonify(status=job["status"])
-    response.status_code = 200
-    return response
 
 @api.route('/jobs/<job_id>', methods=['DELETE'])
 def delete_job(job_id):
