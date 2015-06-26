@@ -3,8 +3,6 @@ import logging
 from os import path
 from settings import Settings
 import job_manager.api as jmapi
-from task_manager.worker import Worker
-
 
 """ This is the starting class for all Cumulonimbi. """
 
