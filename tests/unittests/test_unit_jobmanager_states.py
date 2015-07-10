@@ -32,7 +32,7 @@ class TestRepository(unittest.TestCase):
         # Assert
         job_id = json.loads(rv.data.decode(rv.charset))["job_id"]
         self.assertEqual(excpected_job_id, job_id)
-        self.repository.jobs.insert.assert_called_with({'name': job_name, 'graph': json_graph.node_link_data(g), 'status': 'RCVD'})
+        self.repository.jobs.insert.assert_called_with({'name': job_name, 'graph': json_graph.node_link_data(g), 'status': 'Received'})
 
     def test_job_set_accepted(self):
         # Arrange
