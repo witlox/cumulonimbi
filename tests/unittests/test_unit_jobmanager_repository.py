@@ -4,8 +4,8 @@ import mock
 import unittest
 import networkx as nx
 
-class TestRepository(unittest.TestCase):
 
+class TestRepository(unittest.TestCase):
     @mock.patch('job_manager.repository.MongoClient')
     def test_insert_job(self, mc):
         # Arrange
@@ -17,7 +17,8 @@ class TestRepository(unittest.TestCase):
         repository.insert_job(job_name, graph)
 
         # Assert
-        repository.jobs.insert.assert_called_with({'name': job_name, 'graph': graph, 'status': 'RCVD'})
+        assert repository.jobs.insert.call_count == 1
+        assert repository.jobs.insert.call_args == mock.call({'name': job_name, 'graph': graph, 'status': "Received"})
 
     @mock.patch('job_manager.repository.MongoClient')
     def test_get_all_jobs(self, mc):
@@ -29,8 +30,9 @@ class TestRepository(unittest.TestCase):
         jobs = repository.get_all_jobs()
 
         # Assert
-        assert(len(jobs) == 1)
-        repository.jobs.find.assert_called_once()
+        assert (len(jobs) == 1)
+        assert repository.jobs.find.call_count == 1
+        assert repository.jobs.find.call_args == mock.call()
 
     @mock.patch('job_manager.repository.MongoClient')
     def test_find_one(self, mc):
@@ -44,8 +46,10 @@ class TestRepository(unittest.TestCase):
         job = repository.get_job(job['_id'])
 
         # Assert
-        assert(job['_id'] == job_id)
-        repository.jobs.find.assert_called_once()
+        assert (job['_id'] == job_id)
+        assert repository.jobs.find_one.call_count == 1
+        assert repository.jobs.find_one.call_args == mock.call({'_id': ObjectId(job_id)})
+
 
 if __name__ == '__main__':
     unittest.main()

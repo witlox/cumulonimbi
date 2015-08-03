@@ -32,7 +32,8 @@ class TestRepository(unittest.TestCase):
         # Assert
         body = rv.data.decode(rv.charset)
         self.assertEqual({'job_id': job_id}, json.loads(body))
-        self.repository.jobs.insert.assert_called_with({'name': job_name, 'graph': json_graph.node_link_data(g), 'status': 'RCVD'})
+        assert self.repository.jobs.insert.call_count == 1
+        assert self.repository.jobs.insert.call_args == mock.call({'name': job_name, 'graph': json_graph.node_link_data(g), 'status': 'Received'})
 
     def test_get_jobs(self):
         # Arrange
@@ -47,7 +48,7 @@ class TestRepository(unittest.TestCase):
         # Assert
         body = rv.data.decode(rv.charset)
         self.assertEquals(expected_result, json.loads(body))
-        self.repository.jobs.find.assert_called_once()
+        assert self.repository.jobs.find.call_count == 1
 
     def test_get_job(self):
         # Arrange
@@ -63,7 +64,7 @@ class TestRepository(unittest.TestCase):
         # Assert
         body = rv.data.decode(rv.charset)
         self.assertEquals(expected_result, json.loads(body))
-        self.repository.jobs.find.assert_called_once()
+        assert self.repository.jobs.find_one.call_count == 1
 
 if __name__ == '__main__':
     unittest.main()
