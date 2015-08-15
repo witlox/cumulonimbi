@@ -17,7 +17,7 @@ class StatusUpdate:
         self.s.headers.update({'Authorization': 'Basic ' + base64.b64encode(user_id)})
         data = {u'': status}
         full_url = self.cagaas_base_url + self.cagaas_status_url.replace('{0}', machine_id)
-        r = self.s.put(full_url, data=data)
+        r = self.s.put(full_url, data=data, verify=False)
         if r.status_code != 200:
             raise Exception("Could not update status")
 
