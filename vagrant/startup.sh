@@ -27,6 +27,3 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:5000/job
     sleep 10
 done
 echo "All up!"
-
-echo "Running integration tests"
-docker run -i --rm --net=host --name="integrationtests" witlox/cumulonimbi nosetests cumulonimbi/tests/integrationtests
