@@ -1,0 +1,17 @@
+{
+  "swaggerVersion": "1.2",
+  "basePath": "http://localhost:5000",
+  "apis": [
+    {
+      "path": "/jobs",
+      "operations": [
+        {
+          "method": "GET",
+          "summary": "Get all running jobs",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "models": {}
+}

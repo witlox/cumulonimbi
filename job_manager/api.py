@@ -1,11 +1,13 @@
 """
 This is needed for 2.x and 3.x compatibility regarding imports
 """
+from functools import update_wrapper
 
 from os import path
 
 from bson.json_util import dumps
-from flask import Flask, Response, request, jsonify
+from datetime import timedelta
+from flask import Flask, Response, request, jsonify, make_response
 
 from job_manager.broker import Broker
 from job_manager.repository import JobManagerRepository
@@ -25,31 +27,87 @@ Create placeholder for broker with message queue
 api.broker = None
 
 
+def crossdomain(origin=None, methods=None, headers=None,
+                max_age=21600, attach_to_all=True,
+                automatic_options=True):
+    """
+    Grabbed from Flask snippet 56: http://flask.pocoo.org/snippets/56/
+    """
+    if methods is not None:
+        methods = ', '.join(sorted(x.upper() for x in methods))
+    if headers is not None and not isinstance(headers, basestring):
+        headers = ', '.join(x.upper() for x in headers)
+    if not isinstance(origin, basestring):
+        origin = ', '.join(origin)
+    if isinstance(max_age, timedelta):
+        max_age = max_age.total_seconds()
+
+    def get_methods():
+        if methods is not None:
+            return methods
+
+        options_resp = api.make_default_options_response()
+        return options_resp.headers['allow']
+
+    def decorator(f):
+        def wrapped_function(*args, **kwargs):
+            if automatic_options and request.method == 'OPTIONS':
+                resp = api.make_default_options_response()
+            else:
+                resp = make_response(f(*args, **kwargs))
+            if not attach_to_all and request.method != 'OPTIONS':
+                return resp
+
+            h = resp.headers
+
+            h['Access-Control-Allow-Origin'] = origin
+            h['Access-Control-Allow-Methods'] = get_methods()
+            h['Access-Control-Max-Age'] = str(max_age)
+            if headers is not None:
+                h['Access-Control-Allow-Headers'] = headers
+            return resp
+
+        f.provide_automatic_options = False
+        return update_wrapper(wrapped_function, f)
+
+    return decorator
+
+
+@api.route('/swagger')
+@crossdomain(origin='*')
+def get_swagger():
+    with open('job_manager/swagger.json', 'r') as f:
+        return Response(f.read(), mimetype='application/json')
+
+
 @api.route('/jobs', methods=['GET'])
+@crossdomain(origin='*')
 def get_jobs():
     repository = api.config['REPOSITORY']
-    response = dumps(repository.get_all_jobs())
-    return Response(response, mimetype='application/json')
+    # jsonify does not play well with lists
+    return Response(dumps(repository.get_all_jobs()), mimetype='application/json')
 
 
 @api.route('/jobs', methods=['DELETE'])
+@crossdomain(origin='*')
 def delete_jobs():
     repository = api.config['REPOSITORY']
-    response = dumps(repository.delete_all_jobs())
-    return Response(response, mimetype='application/json')
+    return jsonify(repository.delete_all_jobs())
 
 
 @api.route('/jobs', methods=['POST'])
+@crossdomain(origin='*')
 def create_job():
     data = request.get_json(force=True)
     repository = api.config['REPOSITORY']
     response = {'job_id': repository.insert_job(data["job_name"], data["graph"])}
     if api.broker:
         api.broker.put_on_queue(data["job_name"])
-    return Response(dumps(response), mimetype='application/json')
+    return jsonify(response)
 
 
 @api.route('/jobs/<job_id>/status', methods=['PUT'])
+@crossdomain(origin='*')
 def set_job_status(job_id):
     data = request.get_json(force=True)
     repository = api.config['REPOSITORY']
@@ -71,6 +129,7 @@ def set_job_status(job_id):
 
 @api.route('/jobs/<job_id>/<param>', methods=['GET'])
 @api.route('/jobs/<job_id>', methods=['GET'])
+@crossdomain(origin='*')
 def get_job(job_id, param=None):
     repository = api.config['REPOSITORY']
     if param in ["status", "graph", "name"]:
@@ -80,14 +139,16 @@ def get_job(job_id, param=None):
         return response
     else:
         response = repository.get_job(job_id)
+        # jsonify does not play well with lists
         return Response(dumps(response), mimetype='application/json')
 
 
 @api.route('/jobs/<job_id>', methods=['DELETE'])
+@crossdomain(origin='*')
 def delete_job(job_id):
     repository = api.config['REPOSITORY']
     response = repository.delete_job(job_id)
-    return Response(dumps(response), mimetype='application/json')
+    return jsonify(job=response)
 
 
 def start():

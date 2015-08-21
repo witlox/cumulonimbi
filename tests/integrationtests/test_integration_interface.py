@@ -28,18 +28,6 @@ class InterfaceIntegrationTests(unittest.TestCase):
 
         assert(len(jobs) == 1)
 
-    def test_update_job_failed(self):
-        r = requests.put(self.jobs_url + '/123')
-        assert(r.status_code == 500)
-
-    def test_update_job_success(self):
-        data = {'job_name': 'api_job', 'graph': json_graph.node_link_data(nx.Graph())}
-        r = requests.post(self.jobs_url, data=json.dumps(data))
-        job = r.json()
-
-        r = requests.put(self.jobs_url + '/' + job['job_id'])
-        assert(r.status_code == 200)
-
     def test_get_specific_job(self):
         data = {'job_name': 'api_job', 'graph': json_graph.node_link_data(nx.Graph())}
         r = requests.post(self.jobs_url, data=json.dumps(data))
