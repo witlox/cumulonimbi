@@ -9,7 +9,13 @@
           "method": "GET",
           "summary": "Get all running jobs",
           "type": "string"
+        },
+        {
+          "method": "DELETE",
+          "summary": "Delete all running jobs",
+          "type": "string"
         }
+
       ]
     }
   ],

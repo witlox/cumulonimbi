@@ -80,6 +80,13 @@ def get_swagger():
         return Response(f.read(), mimetype='application/json')
 
 
+@api.route('/jobs', methods=['OPTIONS'])
+@crossdomain(origin='*')
+def get_jobs_options():
+    """ Have to manually add OPTIONS path for anything but GET in cross-domain """
+    return "OK"
+
+
 @api.route('/jobs', methods=['GET'])
 @crossdomain(origin='*')
 def get_jobs():
