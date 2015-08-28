@@ -95,6 +95,12 @@ def handle_invalid_usage(description, code):
     return response
 
 
+@api.route('/swagger')
+@crossdomain(origin='*')
+def get_swagger():
+    return api.send_static_file('swagger.json')
+
+
 @api.route('/jobs', methods=['OPTIONS'])
 @crossdomain(origin='*')
 def get_jobs_options():
