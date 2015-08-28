@@ -27,7 +27,7 @@ Create placeholder for broker with message queue
 api.broker = None
 
 
-def crossdomain(origin=None, methods=None, headers=None,
+def crossdomain(origin=None, methods=None, headers='Accept, Content-Type, Origin',
                 max_age=21600, attach_to_all=True,
                 automatic_options=True):
     """
@@ -73,6 +73,28 @@ def crossdomain(origin=None, methods=None, headers=None,
     return decorator
 
 
+class InvalidAPIUsage(Exception):
+    status_code = 400
+
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
+
+
+def handle_invalid_usage(description, code):
+    response = jsonify({"error": description})
+    response.status_code = code
+    return response
+
+
 @api.route('/swagger')
 @crossdomain(origin='*')
 def get_swagger():
@@ -105,12 +127,15 @@ def delete_jobs():
 @api.route('/jobs', methods=['POST'])
 @crossdomain(origin='*')
 def create_job():
-    data = request.get_json(force=True)
-    repository = api.config['REPOSITORY']
-    response = {'job_id': repository.insert_job(data["job_name"], data["graph"])}
-    if api.broker:
-        api.broker.put_on_queue(data["job_name"])
-    return jsonify(response)
+    try:
+        data = request.get_json(force=True)
+        repository = api.config['REPOSITORY']
+        response = {'job_id': repository.insert_job(data["job_name"], data["graph"])}
+        if api.broker:
+            api.broker.put_on_queue(data["job_name"])
+        return jsonify(response)
+    except Exception as e:
+        return handle_invalid_usage(e.description, e.code)
 
 
 @api.route('/jobs/<job_id>/status', methods=['PUT'])
