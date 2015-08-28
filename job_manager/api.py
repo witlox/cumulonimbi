@@ -98,8 +98,11 @@ def handle_invalid_usage(description, code):
 @api.route('/swagger')
 @crossdomain(origin='*')
 def get_swagger():
-    with open('job_manager/swagger.json', 'r') as f:
-        return Response(f.read(), mimetype='application/json')
+    try:
+        with open('job_manager/swagger.json', 'r') as f:
+            return Response(f.read(), mimetype='application/json')
+    except Exception as e:
+        return e.message + e.description
 
 
 @api.route('/jobs', methods=['OPTIONS'])
