@@ -8,6 +8,8 @@ from os import path
 from bson.json_util import dumps
 from datetime import timedelta
 from flask import Flask, Response, request, jsonify, make_response
+from flask_swagger import swaggerify
+from flask_swagger.swaggerify import swagger
 
 from job_manager.broker import Broker
 from job_manager.repository import JobManagerRepository
@@ -25,7 +27,6 @@ api = Flask(__name__, instance_relative_config=True)
 Create placeholder for broker with message queue
 """
 api.broker = None
-
 
 def crossdomain(origin=None, methods=None, headers='Accept, Content-Type, Origin',
                 max_age=21600, attach_to_all=True,
@@ -98,7 +99,7 @@ def handle_invalid_usage(description, code):
 @api.route('/swagger')
 @crossdomain(origin='*')
 def get_swagger():
-    return api.send_static_file('swagger.json')
+    return Response(swaggerify.output_swagger(), mimetype='application/json')
 
 
 @api.route('/jobs', methods=['OPTIONS'])
@@ -108,6 +109,7 @@ def get_jobs_options():
     return "OK"
 
 
+@swagger('/jobs', 'GET', 'Get all jobs')
 @api.route('/jobs', methods=['GET'])
 @crossdomain(origin='*')
 def get_jobs():
@@ -116,6 +118,7 @@ def get_jobs():
     return Response(dumps(repository.get_all_jobs()), mimetype='application/json')
 
 
+@swagger('/jobs', 'DELETE', 'Delete all jobs')
 @api.route('/jobs', methods=['DELETE'])
 @crossdomain(origin='*')
 def delete_jobs():
