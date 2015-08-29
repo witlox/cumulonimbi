@@ -1,20 +1,19 @@
 """
 This is needed for 2.x and 3.x compatibility regarding imports
 """
-from functools import update_wrapper
 
 from os import path
 
+# noinspection PyPackageRequirements
 from bson.json_util import dumps
-from datetime import timedelta
-from flask import Flask, Response, request, jsonify, make_response
+from flask import Flask, Response, request, jsonify
+
+from flask_cors.crossdomain import crossdomain
 from flask_swagger import swaggerify
 from flask_swagger.swaggerify import swagger
-
 from job_manager.broker import Broker
 from job_manager.repository import JobManagerRepository
 from settings import Settings
-
 from TransitionError import TransitionError
 from StatusUnknownError import StatusUnknownError
 
@@ -28,67 +27,6 @@ Create placeholder for broker with message queue
 """
 api.broker = None
 
-def crossdomain(origin=None, methods=None, headers='Accept, Content-Type, Origin',
-                max_age=21600, attach_to_all=True,
-                automatic_options=True):
-    """
-    Grabbed from Flask snippet 56: http://flask.pocoo.org/snippets/56/
-    """
-    if methods is not None:
-        methods = ', '.join(sorted(x.upper() for x in methods))
-    if headers is not None and not isinstance(headers, basestring):
-        headers = ', '.join(x.upper() for x in headers)
-    if not isinstance(origin, basestring):
-        origin = ', '.join(origin)
-    if isinstance(max_age, timedelta):
-        max_age = max_age.total_seconds()
-
-    def get_methods():
-        if methods is not None:
-            return methods
-
-        options_resp = api.make_default_options_response()
-        return options_resp.headers['allow']
-
-    def decorator(f):
-        def wrapped_function(*args, **kwargs):
-            if automatic_options and request.method == 'OPTIONS':
-                resp = api.make_default_options_response()
-            else:
-                resp = make_response(f(*args, **kwargs))
-            if not attach_to_all and request.method != 'OPTIONS':
-                return resp
-
-            h = resp.headers
-
-            h['Access-Control-Allow-Origin'] = origin
-            h['Access-Control-Allow-Methods'] = get_methods()
-            h['Access-Control-Max-Age'] = str(max_age)
-            if headers is not None:
-                h['Access-Control-Allow-Headers'] = headers
-            return resp
-
-        f.provide_automatic_options = False
-        return update_wrapper(wrapped_function, f)
-
-    return decorator
-
-
-class InvalidAPIUsage(Exception):
-    status_code = 400
-
-    def __init__(self, message, status_code=None, payload=None):
-        Exception.__init__(self)
-        self.message = message
-        if status_code is not None:
-            self.status_code = status_code
-        self.payload = payload
-
-    def to_dict(self):
-        rv = dict(self.payload or ())
-        rv['message'] = self.message
-        return rv
-
 
 def handle_invalid_usage(description, code):
     response = jsonify({"error": description})
@@ -96,38 +34,58 @@ def handle_invalid_usage(description, code):
     return response
 
 
+class AddJobParameter(object):
+    def __init__(self):
+        self.job_name = "string"
+        self.graph = "string"
+
+
+class DefaultResponse(object):
+    def __init__(self):
+        self.job_id = "string"
+
+
+class JobListResponse(object):
+    def __init__(self):
+        self.is_array = True
+        self.status = "string"
+        self.graph = "string"
+        self.name = "string"
+
+
+class DeleteJobsResponse(object):
+    def __init__(self):
+        self.n = "int"
+        self.ok = "int"
+
+
 @api.route('/swagger')
-@crossdomain(origin='*')
+@crossdomain(api, origin='*')
 def get_swagger():
     return Response(swaggerify.output_swagger(), mimetype='application/json')
 
 
-@api.route('/jobs', methods=['OPTIONS'])
-@crossdomain(origin='*')
-def get_jobs_options():
-    """ Have to manually add OPTIONS path for anything but GET in cross-domain """
-    return "OK"
-
-
-@swagger('/jobs', 'GET', 'Get all jobs')
-@api.route('/jobs', methods=['GET'])
-@crossdomain(origin='*')
+@swagger('/jobs', 'GET', 'Get all jobs', JobListResponse())
+@api.route('/jobs', methods=['GET', 'OPTIONS'])
+@crossdomain(api, origin='*')
 def get_jobs():
+    """ Have to manually add OPTIONS path for anything but GET in cross-domain """
     repository = api.config['REPOSITORY']
     # jsonify does not play well with lists
     return Response(dumps(repository.get_all_jobs()), mimetype='application/json')
 
 
-@swagger('/jobs', 'DELETE', 'Delete all jobs')
+@swagger('/jobs', 'DELETE', 'Delete all jobs', DeleteJobsResponse())
 @api.route('/jobs', methods=['DELETE'])
-@crossdomain(origin='*')
+@crossdomain(api, origin='*')
 def delete_jobs():
     repository = api.config['REPOSITORY']
     return jsonify(repository.delete_all_jobs())
 
 
+@swagger('/jobs', 'POST', 'Add a new job', DefaultResponse(), AddJobParameter())
 @api.route('/jobs', methods=['POST'])
-@crossdomain(origin='*')
+@crossdomain(api, origin='*')
 def create_job():
     try:
         data = request.get_json(force=True)
@@ -141,7 +99,7 @@ def create_job():
 
 
 @api.route('/jobs/<job_id>/status', methods=['PUT'])
-@crossdomain(origin='*')
+@crossdomain(api, origin='*')
 def set_job_status(job_id):
     data = request.get_json(force=True)
     repository = api.config['REPOSITORY']
@@ -163,7 +121,7 @@ def set_job_status(job_id):
 
 @api.route('/jobs/<job_id>/<param>', methods=['GET'])
 @api.route('/jobs/<job_id>', methods=['GET'])
-@crossdomain(origin='*')
+@crossdomain(api, origin='*')
 def get_job(job_id, param=None):
     repository = api.config['REPOSITORY']
     if param in ["status", "graph", "name"]:
@@ -178,7 +136,7 @@ def get_job(job_id, param=None):
 
 
 @api.route('/jobs/<job_id>', methods=['DELETE'])
-@crossdomain(origin='*')
+@crossdomain(api, origin='*')
 def delete_job(job_id):
     repository = api.config['REPOSITORY']
     response = repository.delete_job(job_id)
@@ -198,6 +156,11 @@ def start():
     api.config['REPOSITORY'] = settings.repository
     if api.config['REPOSITORY'] is None:
         api.config['REPOSITORY'] = JobManagerRepository()
+
+    # configure swagger
+    swaggerify.set_info("1.0.0", "Cumulonimbi Job Manager API", "The API for consumers of Cumulonimbi to use",
+                        "Pim Witlox & Johannes Bertens")
+    swaggerify.set_host("localhost:5000", "/", ["http"])
 
     # start non-blocking broker with queue
     api.broker = Broker()
