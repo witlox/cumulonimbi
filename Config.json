@@ -1,0 +1,13 @@
+{
+  "azure": {
+	"topic": {
+		"namespace": "cumulonimbi-test",
+		"keyname": "abc",
+		"key": "abc"
+	},
+	"queue" : {
+		"account": "jobmanagertest",
+		"key" : "abc"
+	}
+  }
+}

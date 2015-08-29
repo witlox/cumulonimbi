@@ -8,7 +8,7 @@ from settings import Settings
 from executor import Executor
 
 
-class Worker(Thread):
+class ZmqWorker(Thread):
     """
     Task manager worker, get work from the job manager broker, and execute it.
     """

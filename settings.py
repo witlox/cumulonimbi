@@ -1,3 +1,4 @@
+import json
 import os
 from logging.config import dictConfig, logging
 
@@ -39,6 +40,22 @@ class Settings(object):
     log_stash_port = 9300
 
     repository = None
+
+    try:
+        with open("../Config.json") as json_data_file:
+            data = json.load(json_data_file)
+    except IOError as e:
+        #Fallback config
+        with open("Config.json") as json_data_file:
+            data = json.load(json_data_file)
+
+    print data
+
+    azure_queue_account = data['azure']['queue']['account']
+    azure_queue_key = data['azure']['queue']['key']
+    azure_topic_namespace = data['azure']['topic']['namespace']
+    azure_topic_keyname = data['azure']['topic']['keyname']
+    azure_topic_key = data['azure']['topic']['key']
 
     def configure_logging(self, file_path, module_name):
         """

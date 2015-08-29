@@ -13,3 +13,4 @@ requests
 nose
 python-logstash
 pyzmq
+azure

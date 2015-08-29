@@ -1,7 +1,7 @@
 import time
 import unittest
 from job_manager.zmqbroker import ZmqBroker
-from task_manager.worker import Worker
+from task_manager.zmqworker import ZmqWorker
 
 
 class MyTestCase(unittest.TestCase):
@@ -21,7 +21,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_1_message_1_worker(self):
         # add the worker
-        worker = Worker()
+        worker = ZmqWorker()
         worker.start()
         self.workers.append(worker)
 
@@ -36,8 +36,8 @@ class MyTestCase(unittest.TestCase):
 
     def test_1_message_2_workers(self):
         # add the workers
-        worker1 = Worker()
-        worker2 = Worker()
+        worker1 = ZmqWorker()
+        worker2 = ZmqWorker()
         worker1.start()
         worker2.start()
         self.workers.append(worker1)
@@ -55,7 +55,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_5_messages_1_worker(self):
         # add the worker
-        worker = Worker()
+        worker = ZmqWorker()
         worker.start()
         self.workers.append(worker)
 
@@ -78,8 +78,8 @@ class MyTestCase(unittest.TestCase):
 
     def test_5_messages_2_workers(self):
         # add the workers
-        worker1 = Worker()
-        worker2 = Worker()
+        worker1 = ZmqWorker()
+        worker2 = ZmqWorker()
         worker1.start()
         worker2.start()
         self.workers.append(worker1)
