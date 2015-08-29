@@ -1,13 +1,13 @@
 import time
 import unittest
-from job_manager.broker import Broker
+from job_manager.zmqbroker import ZmqBroker
 from task_manager.worker import Worker
 
 
 class MyTestCase(unittest.TestCase):
     def setUp(self):
         # start non-blocking queue
-        self.broker = Broker()
+        self.broker = ZmqBroker()
         self.broker.start()
         # start a worker
         self.workers = []

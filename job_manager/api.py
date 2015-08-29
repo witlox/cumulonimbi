@@ -11,7 +11,8 @@ from flask import Flask, Response, request, jsonify
 from flask_cors.crossdomain import crossdomain
 from flask_swagger import swaggerify
 from flask_swagger.swaggerify import swagger
-from job_manager.broker import Broker
+from job_manager.azurebroker import AzureBroker
+from job_manager.zmqbroker import ZmqBroker
 from job_manager.repository import JobManagerRepository
 from settings import Settings
 from TransitionError import TransitionError
@@ -90,9 +91,10 @@ def create_job():
     try:
         data = request.get_json(force=True)
         repository = api.config['REPOSITORY']
-        response = {'job_id': repository.insert_job(data["job_name"], data["graph"])}
+        job_id = repository.insert_job(data["job_name"], data["graph"])
+        response = {'job_id': job_id}
         if api.broker:
-            api.broker.put_on_queue(data["job_name"])
+            api.broker.put_on_queue(job_id)
         return jsonify(response)
     except Exception as e:
         return handle_invalid_usage(e.description, e.code)
@@ -163,7 +165,8 @@ def start():
     swaggerify.set_host("localhost:5000", "/", ["http"])
 
     # start non-blocking broker with queue
-    api.broker = Broker()
+    #api.broker = ZmqBroker()
+    api.broker = AzureBroker()
     api.broker.start()
 
     # start flask

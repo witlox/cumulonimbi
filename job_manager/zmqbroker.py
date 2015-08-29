@@ -15,7 +15,6 @@ from settings import Settings
 
 
 class Worker(object):
-
     def __init__(self, address):
         ppp_settings = Settings.ParanoidPirateProtocolSetting()
         self.address = address
@@ -51,9 +50,7 @@ class WorkerQueue(object):
         return address
 
 
-
-class Broker(Thread):
-
+class ZmqBroker(Thread):
     """
     Put tasks on the queue for use by a worker, this implements half of the Paranoid Pirate pattern
     """
@@ -110,7 +107,8 @@ class Broker(Thread):
                     heartbeat_at = time.time() + self.ppp_settings.HEARTBEAT_INTERVAL
 
             if self.queue.qsize() > 0 and workers.size() == 0:
-                logging.info('amount of unfinished tasks: {0}, amount of workers: {1}'.format(self.queue.qsize(), workers.size()))
+                logging.info('amount of unfinished tasks: {0}, amount of workers: {1}'.format(self.queue.qsize(),
+                                                                                              workers.size()))
                 time.sleep(1)
 
             # send the work to the queue
