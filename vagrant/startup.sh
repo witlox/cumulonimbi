@@ -15,7 +15,7 @@ docker pull djbnjack/mongobase
 docker run -d --net=host --name="mongodb" djbnjack/mongobase
 
 docker pull witlox/cumulonimbi
-docker run -d --net=host --name="jobmanager" -v `pwd`/shared:`pwd` witlox/cumulonimbi python cumulonimbi/cumulonimbi.py -a
+docker run -d --net=host --name="jobmanager" -v `pwd`/shared:/root witlox/cumulonimbi python cumulonimbi/cumulonimbi.py -a
 
 echo "Waiting for logstash and the api to start."
 until $(curl --output /dev/null --silent --head --fail http://localhost:9200); do
