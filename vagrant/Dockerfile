@@ -7,6 +7,9 @@ FROM phusion/baseimage:latest
 # Format: MAINTAINER Name <email@addr.ess>
 MAINTAINER J. Bertens <johannes.bertens@gmail.com>
 
+# Expose the Job Manager api
+EXPOSE 5000
+
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
 
