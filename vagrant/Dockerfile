@@ -10,6 +10,9 @@ MAINTAINER J. Bertens <johannes.bertens@gmail.com>
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
 
+# Working from root
+WORKDIR /root
+
 # Install git
 RUN apt-get update && apt-get install -y \
   git \
