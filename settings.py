@@ -26,7 +26,20 @@ class Settings(object):
     debug = False  # sets all debug options to on (also for internal debuggers of external libraries)
     project_root = os.path.abspath(os.path.dirname(__file__))
 
-    job_manager_api = '127.0.0.1'.encode()
+    try:
+        with open("../Config.json") as json_data_file:
+            data = json.load(json_data_file)
+        print data
+        azure_topic_namespace = data['azure']['topic']['namespace']
+        azure_topic_keyname = data['azure']['topic']['keyname']
+        azure_topic_key = data['azure']['topic']['key']
+        job_manager_api = data['jm']['api']
+    except IOError as e:
+        azure_topic_namespace = 'abc'
+        azure_topic_keyname = 'abc'
+        azure_topic_key = 'abc'
+        job_manager_api = '127.0.0.1'.encode()
+
     job_manager_mongo_client_host = '0.0.0.0'.encode()
     job_manager_mongo_client_port = 27017
     job_manager_router_port = 5559
@@ -40,18 +53,6 @@ class Settings(object):
     log_stash_port = 9300
 
     repository = None
-
-    try:
-        with open("../Config.json") as json_data_file:
-            data = json.load(json_data_file)
-        print data
-        azure_topic_namespace = data['azure']['topic']['namespace']
-        azure_topic_keyname = data['azure']['topic']['keyname']
-        azure_topic_key = data['azure']['topic']['key']
-    except IOError as e:
-        azure_topic_namespace = 'abc'
-        azure_topic_keyname = 'abc'
-        azure_topic_key = 'abc'
 
     def configure_logging(self, file_path, module_name):
         """

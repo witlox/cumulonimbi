@@ -162,7 +162,7 @@ def start():
     # configure swagger
     swaggerify.set_info("1.0.0", "Cumulonimbi Job Manager API", "The API for consumers of Cumulonimbi to use",
                         "Pim Witlox & Johannes Bertens")
-    swaggerify.set_host("localhost:5000", "/", ["http"])
+    swaggerify.set_host(settings.job_manager_api + ":5000", "/", ["http"])
 
     # start non-blocking broker with queue
     #api.broker = ZmqBroker()
