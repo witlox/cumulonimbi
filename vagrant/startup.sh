@@ -11,19 +11,19 @@ echo "Getting and starting the containers"
 docker pull pblittle/docker-logstash
 docker run -d \
     -e LOGSTASH_CONFIG_URL=https://raw.githubusercontent.com/witlox/cumulonimbi/master/vagrant/logstash.conf \
-    -p 9292:9292 -p 9200:9200 -p 9300:9300 \
+    --net=host \
     --name="elk" \
     pblittle/docker-logstash
 
 docker pull djbnjack/mongobase
 docker run -d \
-    -p 27017:27017 \
+    --net=host \
     --name="mongodb" \
     djbnjack/mongobase
 
 docker pull witlox/cumulonimbi
 docker run -d \
-    -p 5000:5000 \
+    --net=host \
     --name="jobmanager" \
     -v `pwd`/Config.json:/root/Config.json \
     witlox/cumulonimbi \
