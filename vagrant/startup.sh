@@ -17,13 +17,13 @@ docker run -d \
 
 docker pull djbnjack/mongobase
 docker run -d \
-    -P \
+    -p 27017:27017 \
     --name="mongodb" \
     djbnjack/mongobase
 
 docker pull witlox/cumulonimbi
 docker run -d \
-    -P \
+    -p 5000:5000 \
     --name="jobmanager" \
     -v `pwd`/Config.json:/root/Config.json \
     witlox/cumulonimbi \
