@@ -57,7 +57,6 @@ class Settings(object):
         azure_topic_keyname = 'abc'
         azure_topic_key = 'abc'
 
-
     def configure_logging(self, file_path, module_name):
         """
         Configure logging per instance, set the file path for the rotating file logger
@@ -71,9 +70,9 @@ class Settings(object):
             'version': 1,
             'disable_existing_loggers': False,
             'formatters': {
-                'standard': {'format': '['+module_name+']-%(asctime)s[%(levelname)s](%(name)s):%(message)s',
+                'standard': {'format': '[' + module_name + ']-%(asctime)s[%(levelname)s](%(name)s):%(message)s',
                              'datefmt': '%Y-%m-%d %H:%M:%S'},
-                'logstash': {'format': '['+module_name+']-[%(levelname)s] %(message)s'}
+                'logstash': {'format': '[' + module_name + ']-[%(levelname)s] %(message)s'}
             },
             'handlers': {
                 'fh': {'class': 'logging.handlers.RotatingFileHandler',

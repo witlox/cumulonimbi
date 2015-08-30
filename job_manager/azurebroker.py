@@ -15,8 +15,8 @@ class AzureBroker(Thread):
         self.outgoing_queue = 'outgoing'
         self.incoming_queue = 'incoming'
 
-        self.outgoing_topic = 'outgoing'
-        self.incoming_topic = 'incoming'
+        self.outgoing_topic = 'pending_jobs'
+        self.incoming_topic = 'finished_jobs'
 
         settings = Settings()
         try:
@@ -49,7 +49,7 @@ class AzureBroker(Thread):
                 print m.message_text
                 self.queue_service.delete_message(self.incoming_queue, m.message_id, m.pop_receipt)
 
-            msg = self.bus_service.receive_subscription_message(self.incoming_topic, self.incoming_topic,
+            msg = self.bus_service.receive_subscription_message(self.incoming_topic, self.incoming_topic_subscription,
                                                                 peek_lock=False, timeout=0.1)
             if msg.body is not None:
                 print msg.body + ":" + msg.custom_properties['job_id']

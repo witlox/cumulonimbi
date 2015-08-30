@@ -3,8 +3,17 @@ import logging
 from os import path
 from settings import Settings
 import job_manager.api as jmapi
+from task_manager import launcher as tmlauncher
 
 """ This is the starting class for all Cumulonimbi. """
+
+
+def start_job_manager():
+    jmapi.start()
+
+
+def start_task_manager():
+    tmlauncher.start()
 
 
 class Cumulonimbi:
@@ -23,11 +32,11 @@ class Cumulonimbi:
             print("Runmode: %s" % self.args.__dict__["run_mode"])
             # Determine type of run
             if self.args.__dict__["run_mode"] == "all":
-                self.start_job_manager()
+                start_job_manager()
             elif self.args.__dict__["run_mode"] == "jm":
-                self.start_job_manager()
+                start_job_manager()
             elif self.args.__dict__["run_mode"] == "tm":
-                pass
+                start_task_manager()
 
         except Exception as e:
             logging.error(e)
@@ -77,8 +86,6 @@ class Cumulonimbi:
             if "err" in str(level).lower():
                 root_logger.setLevel(logging.ERROR)
 
-    def start_job_manager(self):
-        jmapi.start()
 
 if __name__ == "__main__":
     Cumulonimbi().run()

@@ -19,7 +19,7 @@ class ZmqWorker(Thread):
         self.daemon = True
 
         self.settings = Settings()
-        self.settings.configure_logging('../logs/task_manager.log', 'TaskManagerWorker')
+        self.settings.configure_logging('../logs/task_manager.log', 'TaskManagerZmqWorker')
 
         self.ppp_settings = self.settings.ParanoidPirateProtocolSetting()
 
