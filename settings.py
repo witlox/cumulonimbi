@@ -23,7 +23,7 @@ class Settings(object):
         PPP_READY = '\x01'.encode()  # Signals worker is ready
         PPP_HEARTBEAT = '\x02'.encode()  # Signals worker heartbeat
 
-    debug = True  # sets all debug options to on (also for internal debuggers of external libraries)
+    debug = False  # False seems better
     project_root = os.path.abspath(os.path.dirname(__file__))
 
     try:
