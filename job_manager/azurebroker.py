@@ -20,15 +20,6 @@ class AzureBroker(Thread):
 
         settings = Settings()
         try:
-            self.queue_service = QueueService(
-                account_name=settings.azure_queue_account,
-                account_key=settings.azure_queue_key)
-            self.queue_service.create_queue(self.outgoing_queue)
-            self.queue_service.create_queue(self.incoming_queue)
-        except Exception as e:
-            print e
-
-        try:
             self.bus_service = ServiceBusService(
                 service_namespace=settings.azure_topic_namespace,
                 shared_access_key_name=settings.azure_topic_keyname,
@@ -44,11 +35,6 @@ class AzureBroker(Thread):
     def run(self):
         # dislike of unstoppable threads
         while not self._quit.is_set():
-            messages = self.queue_service.get_messages(self.incoming_queue, numofmessages=10)
-            for m in messages:
-                print m.message_text
-                self.queue_service.delete_message(self.incoming_queue, m.message_id, m.pop_receipt)
-
             msg = self.bus_service.receive_subscription_message(self.incoming_topic, self.incoming_topic_subscription,
                                                                 peek_lock=False, timeout=0.1)
             if msg.body is not None:
@@ -58,12 +44,11 @@ class AzureBroker(Thread):
 
     def put_on_queue(self, job_id):
         # add something to the outgoing queue
-        self.queue_service.put_message(self.outgoing_queue, job_id)
 
         msg = Message('Created'.encode('utf-8'), custom_properties={'job_id': job_id})
         self.bus_service.send_topic_message(self.outgoing_topic, msg)
 
-        print "Adding job to queue and topic " + job_id
+        print "Adding job to service bus " + job_id
 
     def quit(self):
         self._quit.set()

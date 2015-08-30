@@ -45,14 +45,10 @@ class Settings(object):
         with open("../Config.json") as json_data_file:
             data = json.load(json_data_file)
         print data
-        azure_queue_account = data['azure']['queue']['account']
-        azure_queue_key = data['azure']['queue']['key']
         azure_topic_namespace = data['azure']['topic']['namespace']
         azure_topic_keyname = data['azure']['topic']['keyname']
         azure_topic_key = data['azure']['topic']['key']
     except IOError as e:
-        azure_queue_account = 'abc'
-        azure_queue_key = 'abc'
         azure_topic_namespace = 'abc'
         azure_topic_keyname = 'abc'
         azure_topic_key = 'abc'
