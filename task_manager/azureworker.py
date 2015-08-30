@@ -15,7 +15,7 @@ class AzureWorker(Thread):
         settings = Settings()
         settings.configure_logging('../logs/task_manager.log', 'TaskManagerAzureWorker')
 
-        self.job_manager_url = 'http://' + settings.job_manager_api + ':5000'
+        self.job_manager_url = 'http://' + settings.job_manager_api_connect + ':5000'
 
         self.unfinished = []
         self.finished = []

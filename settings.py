@@ -33,12 +33,14 @@ class Settings(object):
         azure_topic_namespace = data['azure']['topic']['namespace']
         azure_topic_keyname = data['azure']['topic']['keyname']
         azure_topic_key = data['azure']['topic']['key']
-        job_manager_api = data['jm']['api']
+        job_manager_api_bind = data['jm']['api']['bind']
+        job_manager_api_connect = data['jm']['api']['connect']
     except IOError as e:
         azure_topic_namespace = 'abc'
         azure_topic_keyname = 'abc'
         azure_topic_key = 'abc'
-        job_manager_api = '127.0.0.1'.encode()
+        job_manager_api_bind = '0.0.0.0'.encode()
+        job_manager_api_connect = 'docker-cluster.cloudapp.net'.encode()
 
     job_manager_mongo_client_host = '0.0.0.0'.encode()
     job_manager_mongo_client_port = 27017
