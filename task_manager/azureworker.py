@@ -1,6 +1,8 @@
 from threading import Thread, Event
 from time import sleep
 from azure.servicebus import ServiceBusService
+import logging
+import requests
 from settings import Settings
 from task_manager.executor import Executor
 
@@ -12,6 +14,8 @@ class AzureWorker(Thread):
 
         settings = Settings()
         settings.configure_logging('../logs/task_manager.log', 'TaskManagerAzureWorker')
+
+        self.job_manager_url = 'http://' + settings.job_manager_api + ':5000'
 
         self.unfinished = []
         self.finished = []
@@ -37,11 +41,27 @@ class AzureWorker(Thread):
         self._quit.set()
 
     def run(self):
+        self.executor.start()
+
         # dislike of unstoppable threads
         while not self._quit.is_set():
             msg = self.bus_service.receive_subscription_message(self.incoming_topic, self.incoming_topic_subscription,
-                                                                peek_lock=False, timeout=0.1)
+                                                                peek_lock=True)
             if msg.body is not None:
-                print msg.body + ":" + msg.custom_properties['job_id']
+                # New job for us!
+                job_id = msg.custom_properties['job_id']
+                logging.info('getting job with id: ' + job_id + ' from the API')
+
+                r = requests.get(self.job_manager_url + '/jobs/' + job_id)
+                job = r.json()
+
+                msg.delete()
+
+                logging.info('appending tasks from job with id: ' + job['id'] + ' and name: ' + job['name'])
+                self.unfinished.append(job['name'])
 
             sleep(3)
+
+        # stop executor
+        self.executor.quit()
+        self.executor.join()

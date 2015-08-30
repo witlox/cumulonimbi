@@ -4,8 +4,8 @@ import logging
 import time
 from settings import Settings
 
-class Executor(Thread):
 
+class Executor(Thread):
     """
     Execute tasks
     """

@@ -52,14 +52,14 @@ class TestRepository(unittest.TestCase):
 
     def test_get_job(self):
         # Arrange
-        expected_result = [{'name': "new job"}]
-        job_id = str(ObjectId())
+        job_id = ObjectId()
+        expected_result = dict([{'name': "new job", "_id": job_id}])
         self.repository.jobs.find_one.return_value = expected_result
 
         self.app = api.test_client()
 
         # Act
-        rv = self.app.get('/jobs/' + job_id)
+        rv = self.app.get('/jobs/' + str(job_id))
 
         # Assert
         body = rv.data.decode(rv.charset)

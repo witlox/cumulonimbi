@@ -37,18 +37,18 @@ class TestRepository(unittest.TestCase):
     @mock.patch('job_manager.repository.MongoClient')
     def test_find_one(self, mc):
         # Arrange
-        job_id = str(ObjectId())
-        job = {'_id': job_id, 'name': "new job"}
+        job_id = ObjectId()
+        expectedjob = {'id': str(job_id), 'name': "new job"}
         repository = JobManagerRepository()
-        repository.jobs.find_one.return_value = job
+        repository.jobs.find_one.return_value = {'_id': job_id, 'name': "new job"}
 
         # Act
-        job = repository.get_job(job['_id'])
+        job = repository.get_job(str(job_id))
 
         # Assert
-        assert (job['_id'] == job_id)
+        assert (job['id'] == str(job_id))
         assert repository.jobs.find_one.call_count == 1
-        assert repository.jobs.find_one.call_args == mock.call({'_id': ObjectId(job_id)})
+        assert repository.jobs.find_one.call_args == mock.call({'_id': job_id})
 
 
 if __name__ == '__main__':
