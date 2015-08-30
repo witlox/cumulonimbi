@@ -24,18 +24,15 @@ class AzureWorker(Thread):
         self.outgoing_topic = 'finished_jobs'
         self.incoming_topic = 'pending_jobs'
 
-        try:
-            self.bus_service = ServiceBusService(
-                service_namespace=settings.azure_topic_namespace,
-                shared_access_key_name=settings.azure_topic_keyname,
-                shared_access_key_value=settings.azure_topic_key
-            )
-            self.bus_service.create_topic(self.incoming_topic)
-            self.bus_service.create_topic(self.outgoing_topic)
-            self.incoming_topic_subscription = 'AllMessages'
-            self.bus_service.create_subscription(self.incoming_topic, self.incoming_topic_subscription)
-        except Exception as e:
-            print e
+        self.bus_service = ServiceBusService(
+            service_namespace=settings.azure_topic_namespace,
+            shared_access_key_name=settings.azure_topic_keyname,
+            shared_access_key_value=settings.azure_topic_key
+        )
+        self.bus_service.create_topic(self.incoming_topic)
+        self.bus_service.create_topic(self.outgoing_topic)
+        self.incoming_topic_subscription = 'AllMessages'
+        self.bus_service.create_subscription(self.incoming_topic, self.incoming_topic_subscription)
 
     def quit(self):
         self._quit.set()

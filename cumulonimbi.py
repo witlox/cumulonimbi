@@ -9,10 +9,12 @@ from task_manager import launcher as tmlauncher
 
 
 def start_job_manager():
+    print "Starting JobManager"
     jmapi.start()
 
 
 def start_task_manager():
+    print "Starting TaskManager"
     tmlauncher.start()
 
 
@@ -88,4 +90,5 @@ class Cumulonimbi:
 
 
 if __name__ == "__main__":
+    print "Starting Cumulonimbi"
     Cumulonimbi().run()
