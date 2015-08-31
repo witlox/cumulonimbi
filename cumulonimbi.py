@@ -4,6 +4,7 @@ from os import path
 from settings import Settings
 import job_manager.api as jmapi
 from task_manager import launcher as tmlauncher
+import simulator.api as simulator_api
 
 """ This is the starting class for all Cumulonimbi. """
 
@@ -16,6 +17,11 @@ def start_job_manager():
 def start_task_manager():
     print "Starting TaskManager"
     tmlauncher.start()
+
+
+def start_simulator():
+    print "Starting Simulator"
+    simulator_api.start()
 
 
 class Cumulonimbi:
@@ -39,6 +45,8 @@ class Cumulonimbi:
                 start_job_manager()
             elif self.args.__dict__["run_mode"] == "tm":
                 start_task_manager()
+            elif self.args.__dict__["run_mode"] == "s":
+                start_simulator()
 
         except Exception as e:
             logging.error(e)
@@ -65,7 +73,11 @@ class Cumulonimbi:
                                     dest="run_mode",
                                     action="store_const",
                                     const="tm")
-
+        run_mode_group.add_argument("-s", "--simulator",
+                                    help="Launch simulator",
+                                    dest="run_mode",
+                                    action="store_const",
+                                    const="s")
         # Optional arguments
         parser.add_argument("--log-level",
                             default="",

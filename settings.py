@@ -1,6 +1,7 @@
 import json
 import os
 from logging.config import dictConfig, logging
+from logstash_formatter import LogstashFormatterV1
 
 
 class Settings(object):
@@ -33,6 +34,8 @@ class Settings(object):
         azure_topic_namespace = data['azure']['topic']['namespace']
         azure_topic_keyname = data['azure']['topic']['keyname']
         azure_topic_key = data['azure']['topic']['key']
+        azure_queue_account = data['azure']['queue']['account']
+        azure_queue_key = data['azure']['queue']['key']
         job_manager_api_bind = data['jm']['api']['bind']
         job_manager_api_connect = data['jm']['api']['connect']
     except IOError as e:
