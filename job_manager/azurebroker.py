@@ -2,7 +2,6 @@ from threading import Thread, Event
 import time
 
 from azure.servicebus import ServiceBusService, Message
-from azure.storage import QueueService
 
 from settings import Settings
 
