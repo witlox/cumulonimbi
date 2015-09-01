@@ -46,13 +46,10 @@ def update_machine():
 
 @app.route('/machines/<machine_id>', methods=['DELETE'])
 def delete_machines(machine_id):
-    to_delete = None
     for m in state.machines:
         if m['MachineId'] == machine_id:
-            to_delete = m
+            m['IsDeleted'] = True
 
-    if to_delete is not None:
-        state.machines.remove(to_delete)
     return jsonify(state.machines)
 
 
