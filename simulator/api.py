@@ -1,6 +1,7 @@
 from flask import Flask, Response, jsonify, request
 from flask.json import dumps
 from simulator.listener import SimulationListener
+from simulator.machine import Machine
 
 
 class SimulatorState(object):
@@ -20,37 +21,30 @@ def hello():
 @app.route("/machines", methods=['GET'])
 def get_machines():
     # jsonify does not play well with lists
-    return Response(dumps(state.machines), mimetype='application/json')
+    machines = [machine.info for machine in state.machines]
+    return Response(dumps(machines), mimetype='application/json')
 
 
 @app.route('/machines', methods=['POST'])
 def add_machine():
     data = request.get_json(force=True)
-    state.machines.append(data)
-    return jsonify(state.machines)
 
+    machine = Machine(data)
+    machine.start()
 
-@app.route('/machines', methods=['PUT'])
-def update_machine():
-    to_delete = None
-    data = request.get_json(force=True)
-    for m in state.machines:
-        if m['MachineId'] == data['MachineId']:
-            to_delete = m
-
-    if to_delete is not None:
-        state.machines.remove(to_delete)
-    state.machines.append(data)
-    return jsonify(state.machines)
+    state.machines.append(machine)
+    return jsonify(machine.info)
 
 
 @app.route('/machines/<machine_id>', methods=['DELETE'])
 def delete_machines(machine_id):
     for m in state.machines:
-        if m['MachineId'] == machine_id:
-            m['IsDeleted'] = True
+        if m.info['MachineId'] == machine_id:
+            m.quit()
+            m.join()
 
-    return jsonify(state.machines)
+    machines = [machine.info for machine in state.machines]
+    return Response(dumps(machines))
 
 
 def start():
