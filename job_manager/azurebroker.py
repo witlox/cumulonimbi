@@ -1,9 +1,7 @@
 import logging
 from threading import Thread, Event
-import time
-
+from time import sleep
 from azure.servicebus import ServiceBusService, Message
-
 from settings import Settings
 
 
@@ -17,7 +15,7 @@ class AzureBroker(Thread):
         self.outgoing_topic = 'pending_jobs'
         self.incoming_topic = 'finished_jobs'
         self.notification_topic = 'jobs_changed'
-        self.incoming_topic_subscription = 'AllMessages'
+        self.subscription = 'AllMessages'
 
         settings = Settings()
         self.bus_service = ServiceBusService(
@@ -29,23 +27,21 @@ class AzureBroker(Thread):
         self.bus_service.create_topic(self.incoming_topic)
         self.bus_service.create_topic(self.outgoing_topic)
         self.bus_service.create_topic(self.notification_topic)
-        self.bus_service.create_subscription(self.incoming_topic, self.incoming_topic_subscription)
+        self.bus_service.create_subscription(self.incoming_topic, self.subscription)
 
     def run(self):
         # dislike of unstoppable threads
         while not self._quit.is_set():
-            msg = self.bus_service.receive_subscription_message(self.incoming_topic, self.incoming_topic_subscription,
+            msg = self.bus_service.receive_subscription_message(self.incoming_topic, self.subscription,
                                                                 peek_lock=False, timeout=0.1)
             if msg.body is not None:
                 self.log.info(msg.body + ":" + msg.custom_properties['job_id'])
                 notification_msg = Message('Finished'.encode('utf-8'), custom_properties={'job_id': msg.custom_properties['job_id']})
                 self.bus_service.send_topic_message(self.notification_topic, notification_msg)
 
-            time.sleep(3)
+            sleep(3)
 
     def put_on_queue(self, job_id):
-        # add something to the outgoing queue
-
         msg = Message('Created'.encode('utf-8'), custom_properties={'job_id': job_id})
         self.bus_service.send_topic_message(self.outgoing_topic, msg)
         self.bus_service.send_topic_message(self.notification_topic, msg)
