@@ -3,7 +3,7 @@ import logging
 from threading import Thread, Event
 from time import sleep
 
-from azure.storage import QueueService
+from azure.storage.queue import QueueService
 from flask import json
 import requests
 
