@@ -11,11 +11,10 @@ class AzureBroker(Thread):
         Thread.__init__(self)
         self._quit = Event()
         self.daemon = True
-        self.outgoing_queue = 'outgoing'
-        self.incoming_queue = 'incoming'
 
         self.outgoing_topic = 'pending_jobs'
         self.incoming_topic = 'finished_jobs'
+        self.notification_topic = 'jobs_changed'
         self.incoming_topic_subscription = 'AllMessages'
 
         settings = Settings()
@@ -27,6 +26,7 @@ class AzureBroker(Thread):
 
         self.bus_service.create_topic(self.incoming_topic)
         self.bus_service.create_topic(self.outgoing_topic)
+        self.bus_service.create_topic(self.notification_topic)
         self.bus_service.create_subscription(self.incoming_topic, self.incoming_topic_subscription)
 
     def run(self):
@@ -36,6 +36,8 @@ class AzureBroker(Thread):
                                                                 peek_lock=False, timeout=0.1)
             if msg.body is not None:
                 print msg.body + ":" + msg.custom_properties['job_id']
+                notification_msg = Message('Finished'.encode('utf-8'), custom_properties={'job_id': msg.custom_properties['job_id']})
+                self.bus_service.send_topic_message(self.notification_topic, notification_msg)
 
             time.sleep(3)
 
@@ -44,6 +46,7 @@ class AzureBroker(Thread):
 
         msg = Message('Created'.encode('utf-8'), custom_properties={'job_id': job_id})
         self.bus_service.send_topic_message(self.outgoing_topic, msg)
+        self.bus_service.send_topic_message(self.notification_topic, msg)
 
         print "Adding job to service bus " + job_id
 
