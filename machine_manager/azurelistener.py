@@ -6,13 +6,14 @@ from settings import Settings
 
 
 class AzureListener(Thread):
-    def __init__(self):
+    def __init__(self, jobs_state):
         Thread.__init__(self)
         self._quit = Event()
         self.daemon = True
         self.log = logging.getLogger(__name__)
         self.notification_topic = 'jobs_changed'
         self.subscription = 'AllMessages'
+        self.jobs_state = jobs_state
 
         settings = Settings()
         self.bus_service = ServiceBusService(
@@ -33,5 +34,10 @@ class AzureListener(Thread):
                                                                 peek_lock=False, timeout=0.1)
             if msg.body is not None:
                 self.log.info(msg.body + ":" + msg.custom_properties['job_id'])
+                if "Created" in msg.body:
+                    self.jobs_state.job_added(msg.custom_properties['job_id'])
+
+                if "Finished" in msg.body:
+                    self.jobs_state.job_removed(msg.custom_properties['job_id'])
 
             sleep(3)

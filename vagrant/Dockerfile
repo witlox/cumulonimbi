@@ -19,8 +19,10 @@ WORKDIR /root
 # Install git
 RUN apt-get update && apt-get install -y \
   git \
-  python-dev \
-  python-pip
+  python-dev
+
+# Install pip
+RUN easy_install pip
 
 # Get the repository and install reqs
 RUN git clone https://github.com/witlox/cumulonimbi.git && pip install -r cumulonimbi/requirements.txt
