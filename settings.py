@@ -1,7 +1,6 @@
 import json
 import os
 from logging.config import dictConfig, logging
-from logstash_formatter import LogstashFormatterV1
 
 
 class Settings(object):
@@ -25,7 +24,6 @@ class Settings(object):
         PPP_HEARTBEAT = '\x02'.encode()  # Signals worker heartbeat
 
     debug = False  # False seems better
-    project_root = os.path.abspath(os.path.dirname(__file__))
 
     try:
         with open("../Config.json") as json_data_file:
@@ -89,6 +87,9 @@ class Settings(object):
                        'mode': 'a',
                        'maxBytes': self.log_file_size,
                        'backupCount': self.log_file_rotate},
+                'console':{'class':'logging.StreamHandler',
+                        'level':'DEBUG',
+                        'formatter': 'standard'},
                 'ls': {'class': 'logstash.TCPLogstashHandler',
                        'formatter': 'logstash',
                        'level': self.log_stash_level,
@@ -97,7 +98,7 @@ class Settings(object):
                        'version': 1}
             },
             'loggers': {
-                '': {'handlers': ['fh', 'ls'],
+                '': {'handlers': ['fh', 'ls', 'console'],
                      'level': 'DEBUG',
                      'propagate': True}
             }

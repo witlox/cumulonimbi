@@ -1,6 +1,5 @@
 import argparse
 import logging
-from os import path
 from settings import Settings
 import job_manager.api as jmapi
 import machine_manager.api as mmapi
@@ -11,22 +10,22 @@ import simulator.api as simulator_api
 
 
 def start_job_manager():
-    print "Starting JobManager"
+    logging.info("Starting JobManager")
     jmapi.start()
 
 
 def start_task_manager():
-    print "Starting TaskManager"
+    logging.info("Starting TaskManager")
     tmlauncher.start()
 
 
 def start_machine_manager():
-    print "Starting MachineManager"
+    logging.info("Starting MachineManager")
     mmapi.start()
 
 
 def start_simulator():
-    print "Starting Simulator"
+    logging.info("Starting Simulator")
     simulator_api.start()
 
 
@@ -36,14 +35,13 @@ class Cumulonimbi:
 
     def __init__(self):
         settings = Settings()
-        logfile = path.dirname(path.abspath(__file__)) + '/logs/job_manager.log'
-        settings.configure_logging(logfile, 'Cumulonimbi')
+        settings.configure_logging('../logs/cumulonimbi.log', 'Cumulonimbi')
 
     def run(self):
         # Parse command line arguments.
         self.parse_arguments()
         try:
-            print("Runmode: %s" % self.args.__dict__["run_mode"])
+            logging.info("Runmode: %s" % self.args.__dict__["run_mode"])
             # Determine type of run
             if self.args.__dict__["run_mode"] == "all":
                 start_job_manager()
