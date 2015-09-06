@@ -1,5 +1,6 @@
 from flask import Flask, Response, jsonify, request
 from flask.json import dumps
+from settings import Settings
 from simulator.listener import SimulationListener
 from simulator.machine import Machine
 
@@ -48,10 +49,13 @@ def delete_machines(machine_id):
 
 
 def start():
+    settings = Settings()
+    settings.configure_logging('../logs/simulator.log', 'Simulator')
+
     worker = SimulationListener()
     worker.start()
 
-    app.run("0.0.0.0", 8080, debug=False)
+    app.run(host="0.0.0.0", port=settings.simulator_api_port, debug=False)
 
     worker.quit()
     worker.join()

@@ -151,8 +151,7 @@ def start():
     This is a blocking call
     """
     settings = Settings()
-    logfile = path.dirname(path.dirname(path.abspath(__file__))) + '/logs/job_manager.log'
-    settings.configure_logging(logfile, 'JobManagerApi')
+    settings.configure_logging('../logs/job_manager.log', 'JobManager')
 
     # configure storage
     api.config['REPOSITORY'] = settings.repository
@@ -162,7 +161,7 @@ def start():
     # configure swagger
     swaggerify.set_info("1.0.0", "Cumulonimbi Job Manager API", "The API for consumers of Cumulonimbi to use",
                         "Pim Witlox & Johannes Bertens")
-    swaggerify.set_host(settings.job_manager_api_connect + ":5000", "/", ["http"])
+    swaggerify.set_host(settings.job_manager_api_connect + ":" + str(settings.job_manager_api_port), "/", ["http"])
 
     # start non-blocking broker with queue
     #api.broker = ZmqBroker()
@@ -170,7 +169,7 @@ def start():
     api.broker.start()
 
     # start flask
-    api.run(host=settings.job_manager_api_bind, debug=settings.debug)
+    api.run(host=settings.job_manager_api_bind, port=settings.job_manager_api_port, debug=settings.debug)
 
     # cleanup
     api.broker.stop()

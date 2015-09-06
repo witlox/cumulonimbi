@@ -38,16 +38,21 @@ class Settings(object):
         azure_queue_key = data['azure']['queue']['key']
         job_manager_api_bind = data['jm']['api']['bind']
         job_manager_api_connect = data['jm']['api']['connect']
+        job_manager_api_port = data['jm']['api']['port']
     except IOError as e:
         azure_topic_namespace = 'abc'
         azure_topic_keyname = 'abc'
         azure_topic_key = 'abc'
         job_manager_api_bind = '0.0.0.0'.encode()
         job_manager_api_connect = 'docker-cluster.cloudapp.net'.encode()
+        job_manager_api_port = 5000
 
     job_manager_mongo_client_host = '0.0.0.0'.encode()
     job_manager_mongo_client_port = 27017
     job_manager_router_port = 5559
+
+    machine_manager_api_port = 8888
+    simulator_api_port = 8080
 
     log_file_level = 'DEBUG'
     log_file_size = 1024 * 1024 * 100

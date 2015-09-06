@@ -3,6 +3,7 @@ import logging
 from os import path
 from settings import Settings
 import job_manager.api as jmapi
+import machine_manager.api as mmapi
 from task_manager import launcher as tmlauncher
 import simulator.api as simulator_api
 
@@ -17,6 +18,11 @@ def start_job_manager():
 def start_task_manager():
     print "Starting TaskManager"
     tmlauncher.start()
+
+
+def start_machine_manager():
+    print "Starting MachineManager"
+    mmapi.start()
 
 
 def start_simulator():
@@ -45,6 +51,8 @@ class Cumulonimbi:
                 start_job_manager()
             elif self.args.__dict__["run_mode"] == "tm":
                 start_task_manager()
+            elif self.args.__dict__["run_mode"] == "mm":
+                start_machine_manager()
             elif self.args.__dict__["run_mode"] == "s":
                 start_simulator()
 
@@ -73,6 +81,11 @@ class Cumulonimbi:
                                     dest="run_mode",
                                     action="store_const",
                                     const="tm")
+        run_mode_group.add_argument("-mm", "--machine-manager",
+                                    help="Launch machine manager",
+                                    dest="run_mode",
+                                    action="store_const",
+                                    const="mm")
         run_mode_group.add_argument("-s", "--simulator",
                                     help="Launch simulator",
                                     dest="run_mode",
