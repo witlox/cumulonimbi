@@ -19,7 +19,8 @@ WORKDIR /root
 # Install git
 RUN apt-get update && apt-get install -y \
   git \
-  python-dev
+  python-dev \
+  python-setuptools
 
 # Install pip
 RUN easy_install pip
