@@ -57,7 +57,7 @@ class Settings(object):
     log_file_rotate = 10
 
     log_stash_level = 'INFO'
-    log_stash_host = 'localhost'
+    log_stash_host = 'docker-cluster.cloudapp.net'
     log_stash_port = 9300
 
     repository = None
