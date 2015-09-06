@@ -22,18 +22,20 @@ docker run -d \
     djbnjack/mongobase
 
 docker pull witlox/cumulonimbi
+
+echo "Waiting for logstash to start."
+until $(curl --output /dev/null --silent --head --fail http://localhost:9200); do
+    printf '.'
+    sleep 10
+done
+
+echo "It's up! Starting the JobManager API"
 docker run -d \
     --net=host \
     --name="jobmanager" \
     -v `pwd`/Config.json:/root/Config.json \
     witlox/cumulonimbi \
     python cumulonimbi.py -a
-
-echo "Waiting for logstash and the api to start."
-until $(curl --output /dev/null --silent --head --fail http://localhost:9200); do
-    printf '.'
-    sleep 10
-done
 until $(curl --output /dev/null --silent --head --fail http://localhost:5000/jobs); do
     printf '.'
     sleep 10
