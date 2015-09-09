@@ -1,21 +1,10 @@
 from flask import Flask, Response
 from flask.json import dumps
 from machine_manager.azurelistener import AzureListener
+from machine_manager.logic import MachineManagerLogic
 from settings import Settings
 
-
-class MachineManagerState(object):
-    def __init__(self):
-        self.jobs = []
-
-    def job_added(self, job_id):
-        self.jobs.append(job_id)
-
-    def job_removed(self, job_id):
-        self.jobs.remove(job_id)
-
-
-state = MachineManagerState()
+logic = MachineManagerLogic()
 app = Flask(__name__)
 
 
@@ -27,14 +16,14 @@ def hello():
 @app.route("/machines")
 def get_machines():
     # jsonify does not play well with lists
-    return Response(dumps(state.jobs), mimetype='application/json')
+    return Response(dumps(logic.jobs), mimetype='application/json')
 
 
 def start():
     settings = Settings()
     settings.configure_logging('../logs/machine_manager.log', 'MachineManager')
 
-    listener = AzureListener(state)
+    listener = AzureListener(logic)
     listener.start()
 
     app.run("0.0.0.0", settings.machine_manager_api_port, debug=False)
