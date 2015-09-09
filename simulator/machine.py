@@ -1,7 +1,10 @@
 from base64 import b64encode
+import logging
 from threading import Thread, Event
 from time import sleep
+from flask import json, jsonify
 from requests import Session
+import requests
 
 
 def update_status(status, user_id, machine_id):
@@ -16,12 +19,39 @@ def update_status(status, user_id, machine_id):
         raise Exception("Could not update status")
 
 
+def get_jobs():
+    r = requests.get("http://docker-cluster.cloudapp.net:5000/jobs")
+    if r.status_code != 200:
+        raise Exception("Could not get jobs")
+    return json.loads(r.content)
+
+
+def get_new_job():
+    jobs = get_jobs()
+    for job in jobs:
+        if job["status"] == u'Received':
+            return job
+    return None
+
+
+def accept_job(job):
+    requests.put("http://docker-cluster.cloudapp.net:5000/jobs/" + job['id'] + "/status", json.dumps({u'status': 'Accepted'}))
+
+
+def working_on_job(job):
+    requests.put("http://docker-cluster.cloudapp.net:5000/jobs/" + job['id'] + "/status", json.dumps({u'status': 'Running'}))
+
+
+def finish_job(job):
+    requests.put("http://docker-cluster.cloudapp.net:5000/jobs/" + job['id'] + "/status", json.dumps({u'status': 'Done'}))
+
+
 class Machine(Thread):
     def __init__(self, machine):
         Thread.__init__(self)
         self._quit = Event()
         self.daemon = True
-
+        self.log = logging.getLogger(__name__)
         self.info = machine
 
     def run(self):
@@ -29,10 +59,18 @@ class Machine(Thread):
 
         # dislike of unstoppable threads
         while not self._quit.is_set():
-            print self.info['Name'] + " is still alive..."
+            self.log.info(self.info['Name'] + " getting new job from api")
+            job = get_new_job()
+            if job:
+                accept_job(job)
+                sleep(3)
+                working_on_job(job)
+                sleep(10)
+                finish_job(job)
+
             sleep(10)
 
     def quit(self):
-        print self.info['Name'] + " is going down!"
+        self.log.info(self.info['Name'] + " is going down!")
         update_status('Removed', self.info['UserId'], self.info['MachineId'])
         self._quit.set()

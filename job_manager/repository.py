@@ -31,7 +31,7 @@ class JobManagerRepository:
             'Received': ["Rejected", "Accepted"],
             'Rejected': [],
             'Accepted': ["Stale", "Running"],
-            'Running': ["Stale", "Failed"],
+            'Running': ["Stale", "Failed", "Done"],
             'Done': []
         }
 
