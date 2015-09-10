@@ -104,14 +104,14 @@ def create_job():
         job_id = repository.insert_job(data["job_name"], data["graph"])
         response = {'job_id': job_id}
         if api.broker:
-            api.broker.put_on_queue(job_id)
+            api.broker.transmit_job_created(job_id)
         return jsonify(response)
     except Exception as e:
         return handle_invalid_usage(e.description, e.code)
 
 
-@swagger('/jobs/<job_id>/status', 'PUT', 'Update job status', DefaultResponse(), UpdateStatusParameter())
-@api.route('/jobs/<job_id>/status', methods=['PUT'])
+@swagger('/jobs/{job_id}/status', 'PUT', 'Update job status', DefaultResponse(), UpdateStatusParameter(), 'job_id')
+@api.route('/jobs/<job_id>/status', methods=['PUT', 'OPTIONS'])
 @crossdomain(api, origin='*')
 def set_job_status(job_id):
     data = request.get_json(force=True)
@@ -132,12 +132,15 @@ def set_job_status(job_id):
     return response
 
 
-@api.route('/jobs/<job_id>/machine', methods=['PUT'])
+@swagger('/jobs/{job_id}/machine', 'PUT', 'Update machine id', DefaultResponse(), UpdateMachineParameter(), 'job_id')
+@api.route('/jobs/<job_id>/machine', methods=['PUT', 'OPTIONS'])
 @crossdomain(api, origin='*')
 def set_job_machine(job_id):
     data = request.get_json(force=True)
     repository = api.config['REPOSITORY']
     repository.update_job_machine(job_id, data["machine"])
+    if api.broker:
+        api.broker.transmit_job_assigned(job_id, data["machine"])
 
     response = jsonify(message="OK")
     response.status_code = 200
@@ -195,5 +198,5 @@ def start():
     api.run(host=settings.job_manager_api_bind, port=settings.job_manager_api_port, debug=settings.debug)
 
     # cleanup
-    api.broker.stop()
+    api.broker.quit()
     api.broker.join()

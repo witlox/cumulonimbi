@@ -4,6 +4,7 @@ from StatusUnknownError import StatusUnknownError
 from pymongo.errors import ConnectionFailure
 from pymongo import MongoClient
 from bson import ObjectId
+import settings
 
 
 def fix_job_id(job):
@@ -20,8 +21,10 @@ class JobManagerRepository:
         if collection is None:
             collection = "jobs"
 
+        self.settings = settings.Settings()
+
         try:
-            self.client = MongoClient('127.0.0.1', 27017)
+            self.client = MongoClient(self.settings.job_manager_mongo_connect_host, self.settings.job_manager_mongo_client_port)
         except ConnectionFailure(str):
             logging.error("Cannot connect with the MongoDB server: " + str)
             raise

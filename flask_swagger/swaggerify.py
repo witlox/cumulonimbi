@@ -51,10 +51,10 @@ class SwaggerInfoBorg:
 
     def append_to_definitions(self, class_name, cls):
         param_properties = OrderedDict([
-            (x, to_swagger_type(cls.__dict__[x]))
-            for x in cls.__dict__.keys()
-            if isinstance(cls.__dict__[x], str)
-        ])
+                                           (x, to_swagger_type(cls.__dict__[x]))
+                                           for x in cls.__dict__.keys()
+                                           if isinstance(cls.__dict__[x], str)
+                                           ])
 
         param_schema = OrderedDict([
             ('type', 'object'),
@@ -62,17 +62,22 @@ class SwaggerInfoBorg:
         ])
         self.api_definitions.update(OrderedDict([(class_name, param_schema)]))
 
-    def append_to_path(self, path, method, description, response, parameter):
+    def append_to_path(self, path, method, description, response, parameter, path_param):
         path_object = OrderedDict([(method.lower(), OrderedDict([("description", description)]))])
 
         if parameter is not None:
             class_name = type(parameter).__name__
             self.append_to_definitions(class_name, parameter)
-            param_base = OrderedDict([
+            param_base = [OrderedDict([
                 ('name', 'input'), ('in', 'body'), ('required', True),
                 ('schema', OrderedDict([('$ref', '#/definitions/' + class_name)]))
-            ])
-            path_object[method.lower()].update(OrderedDict([("parameters", [param_base])]))
+            ])]
+            if path_param is not None:
+                param_base.append(OrderedDict([
+                    ('name', path_param), ('in', 'path'), ('required', True),
+                    ('type', 'string')
+                ]))
+            path_object[method.lower()].update(OrderedDict([("parameters", param_base)]))
 
         if response is not None:
             class_name = type(response).__name__
@@ -126,8 +131,8 @@ def output_swagger():
     return dumps(swagger_object)
 
 
-def swagger(route, method='GET', description=None, response=None, param=None):
-    state.append_to_path(route, method, description, response, param)
+def swagger(route, method='GET', description=None, response=None, param=None, path_param=None):
+    state.append_to_path(route, method, description, response, param, path_param)
 
     """ Let's behave like a wrapper """
 

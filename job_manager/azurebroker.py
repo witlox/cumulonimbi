@@ -41,12 +41,19 @@ class AzureBroker(Thread):
 
             sleep(3)
 
-    def put_on_queue(self, job_id):
+    def transmit_job_created(self, job_id):
         msg = Message('Created'.encode('utf-8'), custom_properties={'job_id': job_id})
         self.bus_service.send_topic_message(self.outgoing_topic, msg)
         self.bus_service.send_topic_message(self.notification_topic, msg)
 
-        self.log.info("Adding job to service bus " + job_id)
+        self.log.info("Adding job " + job_id + " created to service bus.")
+
+    def transmit_job_assigned(self, job_id, machine_id):
+        msg = Message('Assigned'.encode('utf-8'), custom_properties={'job_id': job_id, 'machine_id': machine_id})
+        self.bus_service.send_topic_message(self.outgoing_topic, msg)
+        self.bus_service.send_topic_message(self.notification_topic, msg)
+
+        self.log.info("Adding job " + job_id + " assigned to " + machine_id + " to the service bus.")
 
     def quit(self):
         self._quit.set()

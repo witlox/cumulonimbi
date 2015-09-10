@@ -46,6 +46,7 @@ class Settings(object):
         job_manager_api_port = 5000
 
     job_manager_mongo_client_host = '0.0.0.0'.encode()
+    job_manager_mongo_connect_host = 'docker-cluster.cloudapp.net'
     job_manager_mongo_client_port = 27017
     job_manager_router_port = 5559
 
