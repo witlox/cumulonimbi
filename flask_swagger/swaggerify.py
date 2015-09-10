@@ -94,8 +94,10 @@ class SwaggerInfoBorg:
 
         if self.api_paths is not None and path in self.api_paths.keys():
             self.api_paths[path].update(path_object)
-        else:
+        elif self.api_paths is None:
             self.api_paths = OrderedDict([(path, path_object)])
+        else:
+            self.api_paths[path] = path_object
 
 
 state = SwaggerInfoBorg()
