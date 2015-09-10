@@ -41,6 +41,16 @@ class AddJobParameter(object):
         self.graph = "string"
 
 
+class UpdateStatusParameter(object):
+    def __init__(self):
+        self.status = "string"
+
+
+class UpdateMachineParameter(object):
+    def __init__(self):
+        self.machine = "string"
+
+
 class DefaultResponse(object):
     def __init__(self):
         self.job_id = "string"
@@ -100,6 +110,7 @@ def create_job():
         return handle_invalid_usage(e.description, e.code)
 
 
+@swagger('/jobs/<job_id>/status', 'PUT', 'Update job status', DefaultResponse(), UpdateStatusParameter())
 @api.route('/jobs/<job_id>/status', methods=['PUT'])
 @crossdomain(api, origin='*')
 def set_job_status(job_id):
@@ -115,6 +126,18 @@ def set_job_status(job_id):
         response = jsonify(message=str(e.message))
         response.status_code = 500
         return response
+
+    response = jsonify(message="OK")
+    response.status_code = 200
+    return response
+
+
+@api.route('/jobs/<job_id>/machine', methods=['PUT'])
+@crossdomain(api, origin='*')
+def set_job_machine(job_id):
+    data = request.get_json(force=True)
+    repository = api.config['REPOSITORY']
+    repository.update_job_machine(job_id, data["machine"])
 
     response = jsonify(message="OK")
     response.status_code = 200
@@ -164,7 +187,7 @@ def start():
     swaggerify.set_host(settings.job_manager_api_connect + ":" + str(settings.job_manager_api_port), "/", ["http"])
 
     # start non-blocking broker with queue
-    #api.broker = ZmqBroker()
+    # api.broker = ZmqBroker()
     api.broker = AzureBroker()
     api.broker.start()
 

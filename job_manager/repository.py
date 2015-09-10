@@ -56,6 +56,11 @@ class JobManagerRepository:
         job["status"] = status
         self.jobs.update({"_id": ObjectId(job_id)}, job)
 
+    def update_job_machine(self, job_id, machine):
+        job = self.jobs.find_one({"_id": ObjectId(job_id)})
+        job["machine"] = machine
+        self.jobs.update({"_id": ObjectId(job_id)}, job)
+
     def get_job(self, job_id):
         job = self.jobs.find_one({"_id": ObjectId(job_id)})
         return fix_job_id(job)
