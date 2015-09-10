@@ -2,6 +2,7 @@ import logging
 from threading import Thread, Event
 from time import sleep
 from azure.servicebus import ServiceBusService
+from flask import json
 from settings import Settings
 
 
@@ -33,11 +34,16 @@ class AzureListener(Thread):
             msg = self.bus_service.receive_subscription_message(self.notification_topic, self.subscription,
                                                                 peek_lock=False, timeout=0.1)
             if msg.body is not None:
-                self.log.info(msg.body + ":" + msg.custom_properties['job_id'])
+                self.log.info(msg.body + ":" + json.dumps(msg.custom_properties))
+
                 if "Created" in msg.body:
                     self.machine_manager_logic.job_added(msg.custom_properties['job_id'])
+
+                if "Assigned" in msg.body:
+                    self.machine_manager_logic.job_assigned(msg.custom_properties['job_id'], msg.custom_properties['machine_id'])
 
                 if "Finished" in msg.body:
                     self.machine_manager_logic.job_removed(msg.custom_properties['job_id'])
 
-            sleep(3)
+            self.machine_manager_logic.check_machines()
+            sleep(10)

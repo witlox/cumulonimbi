@@ -37,6 +37,7 @@ class Settings(object):
         job_manager_api_bind = data['jm']['api']['bind']
         job_manager_api_connect = data['jm']['api']['connect']
         job_manager_api_port = data['jm']['api']['port']
+        cagaas_super_user = data['cagaas']['user']
     except IOError as e:
         azure_topic_namespace = 'abc'
         azure_topic_keyname = 'abc'
@@ -44,6 +45,7 @@ class Settings(object):
         job_manager_api_bind = '0.0.0.0'.encode()
         job_manager_api_connect = 'docker-cluster.cloudapp.net'.encode()
         job_manager_api_port = 5000
+        cagaas_super_user = 'abc'
 
     job_manager_mongo_client_host = '0.0.0.0'.encode()
     job_manager_mongo_connect_host = 'docker-cluster.cloudapp.net'

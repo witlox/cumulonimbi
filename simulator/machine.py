@@ -2,7 +2,7 @@ from base64 import b64encode
 import logging
 from threading import Thread, Event
 from time import sleep
-from flask import json, jsonify
+from flask import json
 from requests import Session
 import requests
 
@@ -26,10 +26,10 @@ def get_jobs():
     return json.loads(r.content)
 
 
-def get_new_job():
+def get_new_job(machine_id):
     jobs = get_jobs()
     for job in jobs:
-        if job["status"] == u'Received':
+        if job["status"] == u'Received' and "machine" in job and job["machine"] == machine_id:
             return job
     return None
 
@@ -60,7 +60,7 @@ class Machine(Thread):
         # dislike of unstoppable threads
         while not self._quit.is_set():
             self.log.info(self.info['Name'] + " getting new job from api")
-            job = get_new_job()
+            job = get_new_job(self.info["MachineId"])
             if job:
                 accept_job(job)
                 sleep(3)
