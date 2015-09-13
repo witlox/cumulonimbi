@@ -35,15 +35,18 @@ def get_new_job(machine_id):
 
 
 def accept_job(job):
-    requests.put("http://docker-cluster.cloudapp.net:5000/jobs/" + job['id'] + "/status", json.dumps({u'status': 'Accepted'}))
+    requests.put("http://docker-cluster.cloudapp.net:5000/jobs/" + job['id'] + "/status",
+                 json.dumps({u'status': 'Accepted'}))
 
 
 def working_on_job(job):
-    requests.put("http://docker-cluster.cloudapp.net:5000/jobs/" + job['id'] + "/status", json.dumps({u'status': 'Running'}))
+    requests.put("http://docker-cluster.cloudapp.net:5000/jobs/" + job['id'] + "/status",
+                 json.dumps({u'status': 'Running'}))
 
 
 def finish_job(job):
-    requests.put("http://docker-cluster.cloudapp.net:5000/jobs/" + job['id'] + "/status", json.dumps({u'status': 'Done'}))
+    requests.put("http://docker-cluster.cloudapp.net:5000/jobs/" + job['id'] + "/status",
+                 json.dumps({u'status': 'Done'}))
 
 
 class Machine(Thread):
@@ -63,14 +66,25 @@ class Machine(Thread):
             job = get_new_job(self.info["MachineId"])
             if job:
                 accept_job(job)
-                sleep(3)
+                self.update_status_to_running()
+                sleep(3)  # it takes 3 seconds to get up and running
                 working_on_job(job)
-                sleep(10)
+                sleep(10)  # the job takes 10 seconds
                 finish_job(job)
+                self.update_status_to_idle()
 
             sleep(10)
 
+    def update_status_to_running(self):
+        update_status('Running', self.info['UserId'], self.info['MachineId'])
+
+    def update_status_to_removed(self):
+        update_status('Removed', self.info['UserId'], self.info['MachineId'])
+
+    def update_status_to_idle(self):
+        update_status('Idle', self.info['UserId'], self.info['MachineId'])
+
     def quit(self):
         self.log.info(self.info['Name'] + " is going down!")
-        update_status('Removed', self.info['UserId'], self.info['MachineId'])
+        self.update_status_to_removed()
         self._quit.set()
