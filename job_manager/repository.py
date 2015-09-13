@@ -28,7 +28,7 @@ class JobManagerRepository:
                                       port=self.settings.job_manager_mongo_client_port,
                                       socketKeepAlive=True,
                                       socketTimeoutMS=1000,
-                                      connectTimeMS=1000)
+                                      connectTimeoutMS=1000)
         except ConnectionFailure(str):
             logging.error("Cannot connect with the MongoDB server: " + str)
             raise
