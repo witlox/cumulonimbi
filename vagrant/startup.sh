@@ -16,11 +16,11 @@ docker run -d \
     --name="elk" \
     pblittle/docker-logstash
 
-docker pull djbnjack/mongobase
+docker pull mongo
 docker run -d \
     --net=host \
     --name="mongodb" \
-    djbnjack/mongobase
+    mongo
 
 docker pull witlox/cumulonimbi
 
