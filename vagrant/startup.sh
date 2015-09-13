@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "Startup script, version 2.1"
+echo "Startup script, version 2.2"
 
 count=$(docker ps -a -q | wc -l)
 if [ "$count" -gt 0 ]; then
