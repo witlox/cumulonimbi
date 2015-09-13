@@ -55,7 +55,7 @@ class Machine(Thread):
         self.info = machine
 
     def run(self):
-        update_status('Running', self.info['UserId'], self.info['MachineId'])
+        update_status('Idle', self.info['UserId'], self.info['MachineId'])
 
         # dislike of unstoppable threads
         while not self._quit.is_set():

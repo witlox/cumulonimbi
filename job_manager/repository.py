@@ -24,7 +24,9 @@ class JobManagerRepository:
         self.settings = settings.Settings()
 
         try:
-            self.client = MongoClient(self.settings.job_manager_mongo_connect_host, self.settings.job_manager_mongo_client_port)
+            self.client = MongoClient(self.settings.job_manager_mongo_connect_host,
+                                      self.settings.job_manager_mongo_client_port,
+                                      socketKeepAlive=True)
         except ConnectionFailure(str):
             logging.error("Cannot connect with the MongoDB server: " + str)
             raise
