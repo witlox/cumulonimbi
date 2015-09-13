@@ -24,13 +24,17 @@ docker run -d \
 
 docker pull witlox/cumulonimbi
 
-echo "Waiting for logstash to start."
+echo "Waiting for logstash and mongo to start."
 until $(curl --output /dev/null --silent --head --fail http://localhost:9200); do
     printf '.'
     sleep 10
 done
+until $(curl --output /dev/null --silent --head --fail http://localhost:27017); do
+    printf '.'
+    sleep 10
+done
 
-echo "It's up! Starting the JobManager API"
+echo "They are up! Starting the JobManager API"
 docker run -d \
     --net=host \
     --name="jobmanager" \
