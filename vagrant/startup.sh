@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "Startup script, version 2.1"
+echo "Startup script, version 2.5"
 
 count=$(docker ps -a -q | wc -l)
 if [ "$count" -gt 0 ]; then
@@ -9,18 +9,18 @@ if [ "$count" -gt 0 ]; then
 fi
 
 echo "Getting and starting the containers"
+docker pull mongo
+docker run -d \
+    --net=host \
+    --name="mongodb" \
+    mongo --storageEngine wiredTiger
+
 docker pull pblittle/docker-logstash
 docker run -d \
     -e LOGSTASH_CONFIG_URL=https://raw.githubusercontent.com/witlox/cumulonimbi/master/vagrant/logstash.conf \
     --net=host \
     --name="elk" \
     pblittle/docker-logstash
-
-docker pull djbnjack/mongobase
-docker run -d \
-    --net=host \
-    --name="mongodb" \
-    djbnjack/mongobase
 
 docker pull witlox/cumulonimbi
 
@@ -29,8 +29,16 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:9200); d
     printf '.'
     sleep 10
 done
+echo ""
 
-echo "It's up! Starting the JobManager API"
+echo "Waiting for mongo to start."
+until $(curl --output /dev/null --silent --fail http://localhost:27017); do
+    printf '.'
+    sleep 10
+done
+echo ""
+
+echo "They are up! Starting the JobManager API"
 docker run -d \
     --net=host \
     --name="jobmanager" \
