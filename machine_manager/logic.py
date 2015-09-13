@@ -60,7 +60,7 @@ def start_new_machine(user_id, machine_name):
     if r.status_code != 201:
         logging.error("Could not create new machine" + str(r))
         raise Exception("Could not create new machine")
-    logging.info("Created machine:" + r.content)
+    logging.info("Created machine:" + str(json.loads(r.content)))
 
 
 class MachineManagerLogic(object):
