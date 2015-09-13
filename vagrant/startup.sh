@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "Startup script, version 2.4"
+echo "Startup script, version 2.5"
 
 count=$(docker ps -a -q | wc -l)
 if [ "$count" -gt 0 ]; then
@@ -13,7 +13,7 @@ docker pull mongo
 docker run -d \
     --net=host \
     --name="mongodb" \
-    mongo
+    mongo --storageEngine wiredTiger
 
 docker pull pblittle/docker-logstash
 docker run -d \
