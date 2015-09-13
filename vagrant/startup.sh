@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "Startup script, version 2.3"
+echo "Startup script, version 2.4"
 
 count=$(docker ps -a -q | wc -l)
 if [ "$count" -gt 0 ]; then
@@ -32,7 +32,7 @@ done
 echo ""
 
 echo "Waiting for mongo to start."
-until $(curl --output /dev/null --silent --head --fail http://localhost:27017); do
+until $(curl --output /dev/null --silent --fail http://localhost:27017); do
     printf '.'
     sleep 10
 done
