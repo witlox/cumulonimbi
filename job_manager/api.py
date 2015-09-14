@@ -12,6 +12,7 @@ from flask_cors.crossdomain import crossdomain
 from flask_swagger import swaggerify
 from flask_swagger.swaggerify import swagger
 from job_manager.azurebroker import AzureBroker
+from job_manager.mongojobs import MongoJobmanager
 from job_manager.zmqbroker import ZmqBroker
 from job_manager.repository import JobManagerRepository
 from settings import Settings
@@ -182,7 +183,7 @@ def start():
     # configure storage
     api.config['REPOSITORY'] = settings.repository
     if api.config['REPOSITORY'] is None:
-        api.config['REPOSITORY'] = JobManagerRepository()
+        api.config['REPOSITORY'] = JobManagerRepository(MongoJobmanager(settings.job_manager_mongo_host))
 
     # configure swagger
     swaggerify.set_info("1.0.0", "Cumulonimbi Job Manager API", "The API for consumers of Cumulonimbi to use",
