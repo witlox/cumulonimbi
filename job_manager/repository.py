@@ -1,4 +1,5 @@
 import logging
+from pymongo.cursor import Cursor
 from TransitionError import TransitionError
 from StatusUnknownError import StatusUnknownError
 from pymongo.errors import ConnectionFailure
@@ -47,6 +48,8 @@ class JobManagerRepository:
         jobs_cursor = self.jobs.find()
         for job in jobs_cursor:
             all_jobs.append(fix_job_id(job))
+        if type(jobs_cursor) is Cursor:
+            jobs_cursor.close()
         return all_jobs
 
     def insert_job(self, job_name, graph):
