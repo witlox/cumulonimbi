@@ -1,5 +1,6 @@
 from base64 import b64encode
 import logging
+import random
 from threading import Thread, Event
 from time import sleep
 from flask import json
@@ -69,11 +70,12 @@ class Machine(Thread):
                 self.update_status_to_running()
                 sleep(3)  # it takes 3 seconds to get up and running
                 working_on_job(job)
-                sleep(10)  # the job takes 10 seconds
+                sleep(random.randint(100, 140))  # the job takes between 100 and 140 seconds
                 finish_job(job)
                 self.update_status_to_idle()
-
-            sleep(10)
+                sleep(3)  # it takes 3 seconds to reset :-)
+            else:
+                sleep(10)
 
     def update_status_to_running(self):
         update_status('Running', self.info['UserId'], self.info['MachineId'])

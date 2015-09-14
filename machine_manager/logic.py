@@ -1,4 +1,5 @@
 from base64 import b64encode
+from time import sleep, time
 from flask import json
 import logging
 import random
@@ -63,32 +64,58 @@ def start_new_machine(user_id, machine_name):
     logging.info("Created machine:" + str(json.loads(r.content)))
 
 
+def shutdown_machine(user_id, machine_id):
+    logging.info("Shutting down machine: " + machine_id)
+    cagaas_base_url = 'http://cagaas.nl/api/VirtualMachines'
+    s = requests.Session()
+    s.headers.update({
+        'Authorization': 'Basic ' + b64encode(user_id),
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    })
+    r = s.delete(cagaas_base_url + '/' + machine_id)
+    if r.status_code != 204:
+        logging.error("Could not delete machine " + str(r))
+        raise Exception("Could not delete machine " + machine_id)
+    logging.info("Shut down machine:" + machine_id)
+
+
 class MachineManagerLogic(object):
     def __init__(self):
         self.settings = settings.Settings()
 
     def check_machines(self):
         idle_machines = get_idle_machines(self.settings.cagaas_super_user)
-        if idle_machines:
-            logging.info("Idle machines: " + str(idle_machines))
+        logging.info("Idle machines before: " + str(idle_machines))
+        unassigned_jobs = get_unassigned_jobs()
+        logging.info("Unassigned jobs: " + str(unassigned_jobs))
 
-            # get jobs without machine
-            jobs = get_unassigned_jobs()
+        missing_machines = len(unassigned_jobs) - len(idle_machines)
+        logging.info("Amount of missing machines: " + str(missing_machines))
 
-            # for each job assign idle machine (till no machines left)
-            for job in jobs:
-                if idle_machines:
-                    random_machine = random.choice(idle_machines)
-                    assign_job_to_machine(job["id"], random_machine["MachineId"])
-                    idle_machines.remove(random_machine)
+        while missing_machines < 0:
+            to_shutdown = idle_machines.pop()
+            shutdown_machine(self.settings.cagaas_super_user, to_shutdown["MachineId"])
+            missing_machines += 1
+
+        while missing_machines > 0:
+            start_new_machine(self.settings.cagaas_super_user, "NewMachine" + str(time()))
+            missing_machines -= 1
+
+        sleep(10)  # let them start/get removed
+        idle_machines = get_idle_machines(self.settings.cagaas_super_user)
+        logging.info("Idle machines after: " + str(idle_machines))
+
+        # for each job assign idle machine (till no machines left)
+        for job in unassigned_jobs:
+            if idle_machines:
+                random_machine = random.choice(idle_machines)
+                logging.info("Assigning job: " + job["id"] + " to machine: " + random_machine["MachineId"])
+                assign_job_to_machine(job["id"], random_machine["MachineId"])
+                idle_machines.remove(random_machine)
 
     def job_added(self, job_id):
-        idle_machines = get_idle_machines(self.settings.cagaas_super_user)
-        if idle_machines:
-            target_machine = random.choice(idle_machines)
-            assign_job_to_machine(job_id, target_machine["MachineId"])
-        else:
-            start_new_machine(self.settings.cagaas_super_user, "Machine_for_" + job_id)
+        pass
 
     def job_removed(self, job_id):
         pass
